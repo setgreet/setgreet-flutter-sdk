@@ -43,13 +43,20 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler {
         try {
           val userId = call.argument<String>("userId")
           val attributes = call.argument<Map<String, Any>>("attributes")
+          val operation = call.argument<String>("operation")
+          val locale = call.argument<String>("locale")
 
           if (userId == null || userId.isEmpty()) {
             result.error("INVALID_ARGUMENT", "User ID cannot be empty", null)
             return
           }
 
-          Setgreet.identifyUser(userId!!, attributes)
+          val op = when (operation?.lowercase()) {
+            "update" -> com.setgreet.model.Operation.UPDATE
+            else -> com.setgreet.model.Operation.CREATE
+          }
+
+          Setgreet.identifyUser(userId!!, attributes, op, locale)
           result.success(null)
         } catch (e: Exception) {
           result.error("USER_ERROR", e.message ?: "Failed to identify user", null)

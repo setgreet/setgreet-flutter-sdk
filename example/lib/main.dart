@@ -55,6 +55,8 @@ class _HomePageState extends State<HomePage> {
       await Setgreet.identifyUser(
         exampleConfig.testUserId,
         attributes: exampleConfig.testUserAttributes,
+        operation: 'create',
+        locale: 'en-US',
       );
 
       await Setgreet.trackEvent('app_opened', properties: {
@@ -84,6 +86,8 @@ class _HomePageState extends State<HomePage> {
       await Setgreet.identifyUser(
         exampleConfig.testUserId,
         attributes: exampleConfig.testUserAttributes,
+        operation: 'create',
+        locale: 'en-US',
       );
 
       _showMessage('SDK initialized successfully!', Colors.green);

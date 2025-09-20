@@ -60,7 +60,17 @@ public class SetgreetPlugin: NSObject, FlutterPlugin {
     }
 
     let attributes = args["attributes"] as? [String: Any]
-    Setgreet.shared.identifyUser(userId: userId, attributes: attributes)
+    let operation = args["operation"] as? String
+    let locale = args["locale"] as? String
+
+    let op: Operation = (operation?.lowercased() == "update") ? .update : .create
+
+    Setgreet.shared.identifyUser(
+      userId: userId,
+      attributes: attributes,
+      operation: op,
+      locale: locale
+    )
     result(nil)
   }
 

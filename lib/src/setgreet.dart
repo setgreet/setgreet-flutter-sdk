@@ -33,15 +33,19 @@ class Setgreet {
     }
   }
 
-  /// Identify a user with optional attributes
+  /// Identify a user with optional attributes, operation, and locale
   ///
   /// [userId] - Unique identifier for the user
   /// [attributes] - Optional user attributes as key-value pairs
+  /// [operation] - Optional operation type ('create' or 'update', defaults to 'create')
+  /// [locale] - Optional user locale (e.g., "en-US"). If not provided, uses device's default locale
   ///
   /// Throws [SetgreetUserException] if user identification fails
   static Future<void> identifyUser(
     String userId, {
     Map<String, dynamic>? attributes,
+    String? operation,
+    String? locale,
   }) async {
     try {
       _ensureInitialized();
@@ -53,6 +57,8 @@ class Setgreet {
       await _channel.invokeMethod('identifyUser', {
         'userId': userId,
         'attributes': attributes ?? {},
+        'operation': operation ?? 'create',
+        'locale': locale,
       });
     } on PlatformException catch (e) {
       throw SetgreetUserException(

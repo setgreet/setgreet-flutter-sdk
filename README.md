@@ -79,19 +79,18 @@ Identifies a user for Setgreet analytics and flow management.
 
 - `userId` (String): The unique identifier for the user
 - `attributes` (Optional): Additional user attributes
+- `operation` (Optional): Operation type ('create' or 'update', defaults to 'create')
+- `locale` (Optional): User's locale (e.g., "en-US"). If not provided, uses device's default locale
 
 ```dart
-// Simple user identification
-await Setgreet.identifyUser('user123');
-
-// With custom attributes
 await Setgreet.identifyUser(
   'user123',
   attributes: {
     'plan': 'premium',
-    'locale': 'en-US',
     'signup_date': '2025-08-27',
   },
+  operation: 'create',
+  locale: 'en-US',
 );
 ```
 
@@ -100,7 +99,7 @@ await Setgreet.identifyUser(
 Clears user identification data and resets user session state for logout scenarios.
 
 ```dart
-await Setgreet.resetUser();
+Setgreet.resetUser();
 ```
 
 ### Show Flow
