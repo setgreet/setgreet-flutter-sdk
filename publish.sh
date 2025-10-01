@@ -155,9 +155,9 @@ publish_package() {
 create_git_tag() {
     local version=$(grep '^version:' pubspec.yaml | sed 's/version: //' | tr -d '\r')
 
-    log_info "Creating git tag v$version..."
-    git tag -a "v$version" -m "Release version $version"
-    git push origin "v$version"
+    log_info "Creating git tag $version..."
+    git tag -a "$version" -m "Release version $version"
+    git push origin "$version"
     log_success "Git tag created and pushed"
 }
 
