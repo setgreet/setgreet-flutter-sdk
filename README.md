@@ -46,7 +46,7 @@ No additional setup required for Android.
 
 ### Initialization
 
-- Setgreet App Key: You can get the app key while creating a new app in the Setgreet flow editor.
+- Setgreet App Key: You can find your App Key at [Apps page](https://app.setgreet.com/apps).
 
 Initialize the SDK in your Flutter app:
 
