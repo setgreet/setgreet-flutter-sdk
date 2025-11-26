@@ -2,12 +2,160 @@ import Flutter
 import UIKit
 import SetgreetSDK
 
-public class SetgreetPlugin: NSObject, FlutterPlugin {
+public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
+  private var eventSink: FlutterEventSink?
+
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "setgreet", binaryMessenger: registrar.messenger())
+    let eventChannel = FlutterEventChannel(name: "setgreet/events", binaryMessenger: registrar.messenger())
+
     let instance = SetgreetPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
+    eventChannel.setStreamHandler(instance)
   }
+
+  // MARK: - FlutterStreamHandler
+
+  public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    self.eventSink = events
+    return nil
+  }
+
+  public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    self.eventSink = nil
+    return nil
+  }
+
+  // MARK: - Flow Callbacks
+
+  private func setupFlowCallbacks() {
+    Setgreet.shared.setFlowCallbacks { [weak self] callbacks in
+      callbacks
+        .onFlowStarted { event in
+          self?.sendEvent(self?.createFlowStartedEvent(event))
+        }
+        .onFlowCompleted { event in
+          self?.sendEvent(self?.createFlowCompletedEvent(event))
+        }
+        .onFlowDismissed { event in
+          self?.sendEvent(self?.createFlowDismissedEvent(event))
+        }
+        .onScreenChanged { event in
+          self?.sendEvent(self?.createScreenChangedEvent(event))
+        }
+        .onActionTriggered { event in
+          self?.sendEvent(self?.createActionTriggeredEvent(event))
+        }
+        .onError { event in
+          self?.sendEvent(self?.createFlowErrorEvent(event))
+        }
+    }
+  }
+
+  private func sendEvent(_ data: [String: Any]?) {
+    guard let data = data, let eventSink = eventSink else { return }
+    DispatchQueue.main.async {
+      eventSink(data)
+    }
+  }
+
+  private func createFlowStartedEvent(_ event: FlowStartedEvent) -> [String: Any] {
+    return [
+      "type": "flowStarted",
+      "flowId": event.flowId,
+      "screenCount": event.screenCount,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  private func createFlowCompletedEvent(_ event: FlowCompletedEvent) -> [String: Any] {
+    return [
+      "type": "flowCompleted",
+      "flowId": event.flowId,
+      "screenCount": event.screenCount,
+      "durationMs": event.durationMs,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  private func createFlowDismissedEvent(_ event: FlowDismissedEvent) -> [String: Any] {
+    return [
+      "type": "flowDismissed",
+      "flowId": event.flowId,
+      "reason": dismissReasonToString(event.reason),
+      "screenIndex": event.screenIndex,
+      "screenCount": event.screenCount,
+      "durationMs": event.durationMs,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  private func createScreenChangedEvent(_ event: ScreenChangedEvent) -> [String: Any] {
+    return [
+      "type": "screenChanged",
+      "flowId": event.flowId,
+      "fromIndex": event.fromIndex,
+      "toIndex": event.toIndex,
+      "screenCount": event.screenCount,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  private func createActionTriggeredEvent(_ event: ActionTriggeredEvent) -> [String: Any] {
+    var dict: [String: Any] = [
+      "type": "actionTriggered",
+      "flowId": event.flowId,
+      "actionType": event.actionType.lowercased(),
+      "screenIndex": event.screenIndex,
+      "timestamp": event.timestamp * 1000
+    ]
+    if let actionName = event.actionName {
+      dict["actionName"] = actionName
+    } else {
+      dict["actionName"] = NSNull()
+    }
+    return dict
+  }
+
+  private func createFlowErrorEvent(_ event: FlowErrorEvent) -> [String: Any] {
+    return [
+      "type": "flowError",
+      "flowId": event.flowId,
+      "errorType": errorTypeToString(event.errorType),
+      "message": event.message,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  private func dismissReasonToString(_ reason: DismissReason) -> String {
+    switch reason {
+    case .userClose:
+      return "userClose"
+    case .userSkip:
+      return "userSkip"
+    case .backPress:
+      return "backPress"
+    case .replaced:
+      return "replaced"
+    case .programmatic:
+      return "programmatic"
+    }
+  }
+
+  private func errorTypeToString(_ errorType: FlowErrorType) -> String {
+    switch errorType {
+    case .network:
+      return "network"
+    case .parse:
+      return "parse"
+    case .display:
+      return "display"
+    case .unknown:
+      return "unknown"
+    }
+  }
+
+  // MARK: - Method Handling
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
@@ -44,6 +192,7 @@ public class SetgreetPlugin: NSObject, FlutterPlugin {
     let config = SetgreetConfig(debugMode: debugMode)
 
     Setgreet.shared.initialize(appKey: appKey, config: config)
+    setupFlowCallbacks()
     result(nil)
   }
 

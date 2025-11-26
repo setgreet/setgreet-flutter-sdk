@@ -160,6 +160,84 @@ await Setgreet.trackEvent(
 );
 ```
 
+### Flow Callbacks
+
+Listen to flow lifecycle events to track user interactions and flow completion.
+
+**Available Callbacks:**
+
+- `onFlowStarted`: Called when a flow begins displaying
+- `onFlowCompleted`: Called when user completes all screens in the flow
+- `onFlowDismissed`: Called when user dismisses the flow before completion
+- `onScreenChanged`: Called when user navigates between screens
+- `onActionTriggered`: Called when user interacts with buttons
+- `onError`: Called when an error occurs during flow operations
+
+**Using Callbacks Builder:**
+
+```dart
+Setgreet.setFlowCallbacks(
+  SetgreetFlowCallbacks()
+    ..onFlowStarted((event) {
+      print('Flow started: ${event.flowId}');
+      print('Total screens: ${event.screenCount}');
+    })
+    ..onFlowCompleted((event) {
+      print('Flow completed: ${event.flowId}');
+      print('Duration: ${event.durationMs}ms');
+    })
+    ..onFlowDismissed((event) {
+      print('Flow dismissed: ${event.flowId}');
+      print('Reason: ${event.reason}');
+      print('Screen: ${event.screenIndex + 1}/${event.screenCount}');
+    })
+    ..onScreenChanged((event) {
+      print('Screen changed: ${event.fromIndex + 1} -> ${event.toIndex + 1}');
+    })
+    ..onActionTriggered((event) {
+      print('Action: ${event.actionType}');
+      if (event.actionName != null) {
+        print('Custom event name: ${event.actionName}');
+      }
+    })
+    ..onError((event) {
+      print('Error: ${event.errorType} - ${event.message}');
+    }),
+);
+```
+
+**Using Stream API:**
+
+```dart
+// Listen to all events as a stream
+Setgreet.flowEvents.listen((event) {
+  switch (event) {
+    case FlowStartedEvent():
+      print('Flow started: ${event.flowId}');
+    case FlowCompletedEvent():
+      print('Flow completed: ${event.flowId}');
+    case FlowDismissedEvent():
+      print('Flow dismissed: ${event.reason}');
+    case ScreenChangedEvent():
+      print('Screen changed: ${event.fromIndex} -> ${event.toIndex}');
+    case ActionTriggeredEvent():
+      print('Action: ${event.actionType}');
+    case FlowErrorEvent():
+      print('Error: ${event.errorType}');
+  }
+});
+```
+
+**Dismiss Reasons:**
+
+| Reason | Description |
+|--------|-------------|
+| `userClose` | User tapped the close button |
+| `userSkip` | User tapped the skip button |
+| `backPress` | User pressed the back button (hardware) |
+| `replaced` | Flow was replaced by a higher priority flow |
+| `programmatic` | Flow was dismissed programmatically |
+
 ### General Issues
 
 If you continue to have issues, please [open an issue](https://github.com/setgreet/setgreet-flutter-sdk/issues) with:

@@ -1,12 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'config.dart';
 import 'exceptions.dart';
+import 'flow_events.dart';
+import 'flow_callbacks.dart';
 
 /// Main Setgreet SDK class
 class Setgreet {
   static const MethodChannel _channel = MethodChannel('setgreet');
+  static const EventChannel _eventChannel = EventChannel('setgreet/events');
 
   static bool _initialized = false;
+  static SetgreetFlowCallbacks? _callbacks;
+  static StreamSubscription? _eventSubscription;
 
   /// Initialize the Setgreet SDK with your app key
   ///
@@ -25,12 +32,41 @@ class Setgreet {
 
       await _channel.invokeMethod('initialize', configMap);
       _initialized = true;
+
+      // Start listening for flow events
+      _startEventListener();
     } on PlatformException catch (e) {
       throw SetgreetInitializationException(
         e.message ?? 'Failed to initialize Setgreet SDK',
         code: e.code,
       );
     }
+  }
+
+  /// Start listening for flow events from native
+  static void _startEventListener() {
+    _eventSubscription?.cancel();
+    _eventSubscription = _eventChannel
+        .receiveBroadcastStream()
+        .listen(_handleEvent, onError: _handleEventError);
+  }
+
+  /// Handle incoming flow events
+  static void _handleEvent(dynamic event) {
+    if (event == null || _callbacks == null) return;
+
+    try {
+      final map = Map<dynamic, dynamic>.from(event as Map);
+      final flowEvent = SetgreetFlowEvent.fromMap(map);
+      _callbacks?.dispatchEvent(flowEvent);
+    } catch (e) {
+      // Silently ignore malformed events
+    }
+  }
+
+  /// Handle event stream errors
+  static void _handleEventError(dynamic error) {
+    // Silently ignore stream errors
   }
 
   /// Identify a user with optional attributes, operation, and locale
@@ -161,6 +197,62 @@ class Setgreet {
         code: e.code,
       );
     }
+  }
+
+  // MARK: - Flow Event Callbacks
+
+  /// Sets callbacks to receive flow lifecycle events.
+  ///
+  /// Only one callbacks instance can be active at a time.
+  /// Setting new callbacks will replace the previous ones.
+  ///
+  /// Example:
+  /// ```dart
+  /// Setgreet.setFlowCallbacks(
+  ///   SetgreetFlowCallbacks()
+  ///     ..onFlowStarted((event) {
+  ///       print('Flow started: ${event.flowId}');
+  ///     })
+  ///     ..onFlowCompleted((event) {
+  ///       analytics.log('flow_completed', {'duration': event.durationMs});
+  ///     })
+  ///     ..onActionTriggered((event) {
+  ///       if (event.actionName != null) {
+  ///         trackCustomEvent(event.actionName!);
+  ///       }
+  ///     }),
+  /// );
+  /// ```
+  static void setFlowCallbacks(SetgreetFlowCallbacks? callbacks) {
+    _callbacks = callbacks;
+  }
+
+  /// Get a stream of all flow events.
+  ///
+  /// Use this for reactive programming patterns.
+  ///
+  /// Example:
+  /// ```dart
+  /// Setgreet.flowEvents.listen((event) {
+  ///   switch (event) {
+  ///     case FlowStartedEvent():
+  ///       print('Flow started: ${event.flowId}');
+  ///     case FlowCompletedEvent():
+  ///       print('Flow completed: ${event.flowId}');
+  ///     // ... handle other events
+  ///   }
+  /// });
+  /// ```
+  static Stream<SetgreetFlowEvent> get flowEvents {
+    return _eventChannel.receiveBroadcastStream().map((event) {
+      final map = Map<dynamic, dynamic>.from(event as Map);
+      return SetgreetFlowEvent.fromMap(map);
+    });
+  }
+
+  /// Clears all registered flow callbacks.
+  static void clearFlowCallbacks() {
+    _callbacks = null;
   }
 
   /// Check if the SDK has been initialized
