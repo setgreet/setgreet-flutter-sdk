@@ -46,6 +46,9 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         .onActionTriggered { event in
           self?.sendEvent(self?.createActionTriggeredEvent(event))
         }
+        .onPermissionRequested { event in
+          self?.sendEvent(self?.createPermissionRequestedEvent(event))
+        }
         .onError { event in
           self?.sendEvent(self?.createFlowErrorEvent(event))
         }
@@ -127,6 +130,17 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     ]
   }
 
+  private func createPermissionRequestedEvent(_ event: PermissionRequestedEvent) -> [String: Any] {
+    return [
+      "type": "permissionRequested",
+      "flowId": event.flowId,
+      "permissionType": permissionTypeToString(event.permissionType),
+      "result": permissionResultToString(event.result),
+      "screenIndex": event.screenIndex,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
   private func dismissReasonToString(_ reason: DismissReason) -> String {
     switch reason {
     case .userClose:
@@ -152,6 +166,32 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       return "display"
     case .unknown:
       return "unknown"
+    }
+  }
+
+  private func permissionTypeToString(_ permissionType: PermissionType) -> String {
+    switch permissionType {
+    case .notification:
+      return "notification"
+    case .location:
+      return "location"
+    case .camera:
+      return "camera"
+    }
+  }
+
+  private func permissionResultToString(_ result: PermissionResult) -> String {
+    switch result {
+    case .granted:
+      return "granted"
+    case .denied:
+      return "denied"
+    case .permanentlyDenied:
+      return "permanently_denied"
+    case .alreadyGranted:
+      return "already_granted"
+    case .notRequired:
+      return "not_required"
     }
   }
 

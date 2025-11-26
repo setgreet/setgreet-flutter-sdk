@@ -6,6 +6,8 @@ typedef FlowCompletedCallback = void Function(FlowCompletedEvent event);
 typedef FlowDismissedCallback = void Function(FlowDismissedEvent event);
 typedef ScreenChangedCallback = void Function(ScreenChangedEvent event);
 typedef ActionTriggeredCallback = void Function(ActionTriggeredEvent event);
+typedef PermissionRequestedCallback = void Function(
+    PermissionRequestedEvent event);
 typedef FlowErrorCallback = void Function(FlowErrorEvent event);
 
 /// Container for flow event callbacks using builder pattern.
@@ -38,6 +40,7 @@ class SetgreetFlowCallbacks {
   FlowDismissedCallback? _onDismissed;
   ScreenChangedCallback? _onScreenChanged;
   ActionTriggeredCallback? _onActionTriggered;
+  PermissionRequestedCallback? _onPermissionRequested;
   FlowErrorCallback? _onError;
 
   /// Register a callback for when a flow starts presenting.
@@ -70,6 +73,13 @@ class SetgreetFlowCallbacks {
     return this;
   }
 
+  /// Register a callback for when a permission request completes.
+  SetgreetFlowCallbacks onPermissionRequested(
+      PermissionRequestedCallback callback) {
+    _onPermissionRequested = callback;
+    return this;
+  }
+
   /// Register a callback for when an error occurs.
   SetgreetFlowCallbacks onError(FlowErrorCallback callback) {
     _onError = callback;
@@ -89,6 +99,8 @@ class SetgreetFlowCallbacks {
         _onScreenChanged?.call(event);
       case ActionTriggeredEvent():
         _onActionTriggered?.call(event);
+      case PermissionRequestedEvent():
+        _onPermissionRequested?.call(event);
       case FlowErrorEvent():
         _onError?.call(event);
     }

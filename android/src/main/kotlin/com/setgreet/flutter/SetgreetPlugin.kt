@@ -55,6 +55,9 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
       onActionTriggered { event ->
         sendEvent(createActionTriggeredEvent(event))
       }
+      onPermissionRequested { event ->
+        sendEvent(createPermissionRequestedEvent(event))
+      }
       onError { event ->
         sendEvent(createFlowErrorEvent(event))
       }
@@ -126,6 +129,17 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
       "flowId" to event.flowId,
       "errorType" to event.errorType.toFlutterString(),
       "message" to event.message,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  private fun createPermissionRequestedEvent(event: SetgreetFlowEvent.PermissionRequested): Map<String, Any?> {
+    return mapOf(
+      "type" to "permissionRequested",
+      "flowId" to event.flowId,
+      "permissionType" to event.permissionType,
+      "result" to event.result,
+      "screenIndex" to event.screenIndex,
       "timestamp" to event.timestamp.toDouble()
     )
   }

@@ -61,6 +61,66 @@ enum FlowErrorType {
   }
 }
 
+/// Types of permissions that can be requested within a flow.
+enum PermissionType {
+  /// Push notification permission
+  notification,
+
+  /// Location access permission
+  location,
+
+  /// Camera access permission
+  camera;
+
+  static PermissionType fromString(String value) {
+    switch (value) {
+      case 'notification':
+        return PermissionType.notification;
+      case 'location':
+        return PermissionType.location;
+      case 'camera':
+        return PermissionType.camera;
+      default:
+        return PermissionType.notification;
+    }
+  }
+}
+
+/// Results of a permission request.
+enum PermissionResult {
+  /// Permission was granted by the user
+  granted,
+
+  /// Permission was denied by the user
+  denied,
+
+  /// Permission was permanently denied (user must enable in settings)
+  permanentlyDenied,
+
+  /// Permission was already granted before the request
+  alreadyGranted,
+
+  /// Permission request was not required or not applicable
+  notRequired;
+
+  static PermissionResult fromString(String value) {
+    switch (value) {
+      case 'granted':
+        return PermissionResult.granted;
+      case 'denied':
+        return PermissionResult.denied;
+      case 'permanently_denied':
+        return PermissionResult.permanentlyDenied;
+      case 'already_granted':
+        return PermissionResult.alreadyGranted;
+      case 'not_required':
+        return PermissionResult.notRequired;
+      default:
+        return PermissionResult.notRequired;
+    }
+  }
+}
+
 /// Sealed class hierarchy representing all flow lifecycle events.
 sealed class SetgreetFlowEvent {
   final String flowId;
@@ -120,6 +180,15 @@ sealed class SetgreetFlowEvent {
           flowId: flowId,
           errorType: FlowErrorType.fromString(map['errorType'] as String),
           message: map['message'] as String,
+          timestamp: timestamp,
+        );
+      case 'permissionRequested':
+        return PermissionRequestedEvent(
+          flowId: flowId,
+          permissionType:
+              PermissionType.fromString(map['permissionType'] as String),
+          result: PermissionResult.fromString(map['result'] as String),
+          screenIndex: map['screenIndex'] as int,
           timestamp: timestamp,
         );
       default:
@@ -258,4 +327,28 @@ class FlowErrorEvent extends SetgreetFlowEvent {
   @override
   String toString() =>
       'FlowErrorEvent(flowId: $flowId, errorType: $errorType, message: $message)';
+}
+
+/// Emitted when a permission request completes within a flow.
+class PermissionRequestedEvent extends SetgreetFlowEvent {
+  /// The type of permission that was requested
+  final PermissionType permissionType;
+
+  /// The result of the permission request
+  final PermissionResult result;
+
+  /// The screen index where the permission was requested (0-based)
+  final int screenIndex;
+
+  const PermissionRequestedEvent({
+    required super.flowId,
+    required this.permissionType,
+    required this.result,
+    required this.screenIndex,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'PermissionRequestedEvent(flowId: $flowId, permissionType: $permissionType, result: $result)';
 }

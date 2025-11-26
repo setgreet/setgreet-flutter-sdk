@@ -171,6 +171,7 @@ Listen to flow lifecycle events to track user interactions and flow completion.
 - `onFlowDismissed`: Called when user dismisses the flow before completion
 - `onScreenChanged`: Called when user navigates between screens
 - `onActionTriggered`: Called when user interacts with buttons
+- `onPermissionRequested`: Called when a permission request completes
 - `onError`: Called when an error occurs during flow operations
 
 **Using Callbacks Builder:**
@@ -200,6 +201,9 @@ Setgreet.setFlowCallbacks(
         print('Custom event name: ${event.actionName}');
       }
     })
+    ..onPermissionRequested((event) {
+      print('Permission: ${event.permissionType} -> ${event.result}');
+    })
     ..onError((event) {
       print('Error: ${event.errorType} - ${event.message}');
     }),
@@ -222,6 +226,8 @@ Setgreet.flowEvents.listen((event) {
       print('Screen changed: ${event.fromIndex} -> ${event.toIndex}');
     case ActionTriggeredEvent():
       print('Action: ${event.actionType}');
+    case PermissionRequestedEvent():
+      print('Permission: ${event.permissionType} -> ${event.result}');
     case FlowErrorEvent():
       print('Error: ${event.errorType}');
   }
@@ -237,6 +243,40 @@ Setgreet.flowEvents.listen((event) {
 | `backPress` | User pressed the back button (hardware) |
 | `replaced` | Flow was replaced by a higher priority flow |
 | `programmatic` | Flow was dismissed programmatically |
+
+**Permission Types:**
+
+| Type | Description |
+|------|-------------|
+| `notification` | Push notification permission |
+| `location` | Location access permission |
+| `camera` | Camera access permission |
+
+**Permission Results:**
+
+| Result | Description |
+|--------|-------------|
+| `granted` | Permission was granted by the user |
+| `denied` | Permission was denied by the user |
+| `permanentlyDenied` | Permission was permanently denied |
+| `alreadyGranted` | Permission was already granted |
+| `notRequired` | Permission request was not required |
+
+## Permissions Setup
+
+If your flows use permission buttons, add the required keys to your `Info.plist` (iOS):
+
+```xml
+<!-- For location permission -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Your description for location usage</string>
+
+<!-- For camera permission -->
+<key>NSCameraUsageDescription</key>
+<string>Your description for camera usage</string>
+```
+
+Note: Notification permission doesn't require an Info.plist key.
 
 ### General Issues
 

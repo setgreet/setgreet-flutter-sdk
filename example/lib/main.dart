@@ -65,6 +65,9 @@ class _HomePageState extends State<HomePage> {
           }
           _addLog(log);
         })
+        ..onPermissionRequested((event) {
+          _addLog('Permission: ${event.permissionType.name} -> ${event.result.name}');
+        })
         ..onError((event) {
           _addLog('Error: ${event.errorType.name} - ${event.message}');
         }),
