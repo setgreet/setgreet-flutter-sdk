@@ -8,8 +8,8 @@ Setgreet Flutter SDK allows you to show Setgreet flows in your Flutter app.
 
 - Flutter: >=3.0.0
 - Dart: >=3.0.0
-- Android: minSdkVersion 21
-- iOS: 11.0+
+- Android: minSdkVersion 23
+- iOS: 15.0+
 
 ## Installation
 
@@ -19,7 +19,7 @@ Add `setgreet` as a dependency in your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  setgreet: ^0.1.0
+  setgreet: ^1.0.0
 ```
 
 Then run:
@@ -100,6 +100,14 @@ Clears user identification data and resets user session state for logout scenari
 
 ```dart
 Setgreet.resetUser();
+```
+
+### Anonymous ID
+
+The SDK automatically generates an anonymous ID on initialization, which persists across app launches. When `identifyUser` is called, the anonymous identity is merged with the identified user. A new anonymous ID is generated when `resetUser()` is called.
+
+```dart
+final anonId = await Setgreet.anonymousId;
 ```
 
 ### Show Flow
@@ -243,6 +251,8 @@ Setgreet.flowEvents.listen((event) {
 | `backPress` | User pressed the back button (hardware) |
 | `replaced` | Flow was replaced by a higher priority flow |
 | `programmatic` | Flow was dismissed programmatically |
+| `swipeDown` | User swiped down to dismiss a bottom sheet |
+| `completed` | Flow reached its end node |
 
 **Permission Types:**
 

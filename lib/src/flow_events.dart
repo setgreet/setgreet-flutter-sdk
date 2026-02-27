@@ -13,7 +13,16 @@ enum DismissReason {
   replaced,
 
   /// Flow was dismissed programmatically via SDK API
-  programmatic;
+  programmatic,
+
+  /// User swiped down to dismiss a bottom sheet
+  swipeDown,
+
+  /// Flow reached its end node
+  completed,
+
+  /// User chose to be reminded later
+  remindLater;
 
   static DismissReason fromString(String value) {
     switch (value) {
@@ -27,6 +36,12 @@ enum DismissReason {
         return DismissReason.replaced;
       case 'programmatic':
         return DismissReason.programmatic;
+      case 'swipeDown':
+        return DismissReason.swipeDown;
+      case 'completed':
+        return DismissReason.completed;
+      case 'remindLater':
+        return DismissReason.remindLater;
       default:
         return DismissReason.userClose;
     }

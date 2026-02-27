@@ -258,6 +258,20 @@ class Setgreet {
   /// Check if the SDK has been initialized
   static bool get isInitialized => _initialized;
 
+  /// Get the anonymous ID assigned to this device.
+  ///
+  /// Automatically generated on initialization and persisted across app launches.
+  /// A new anonymous ID is generated when [resetUser] is called.
+  ///
+  /// Returns null if the SDK has not been initialized.
+  static Future<String?> get anonymousId async {
+    try {
+      return await _channel.invokeMethod<String>('getAnonymousId');
+    } on PlatformException {
+      return null;
+    }
+  }
+
   /// Ensure the SDK is initialized before performing operations
   static void _ensureInitialized() {
     if (!_initialized) {

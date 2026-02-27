@@ -153,6 +153,12 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       return "replaced"
     case .programmatic:
       return "programmatic"
+    case .swipeDown:
+      return "swipeDown"
+    case .completed:
+      return "completed"
+    case .remindLater:
+      return "remindLater"
     }
   }
 
@@ -169,30 +175,12 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     }
   }
 
-  private func permissionTypeToString(_ permissionType: PermissionType) -> String {
-    switch permissionType {
-    case .notification:
-      return "notification"
-    case .location:
-      return "location"
-    case .camera:
-      return "camera"
-    }
+  private func permissionTypeToString(_ permissionType: String) -> String {
+    return permissionType
   }
 
-  private func permissionResultToString(_ result: PermissionResult) -> String {
-    switch result {
-    case .granted:
-      return "granted"
-    case .denied:
-      return "denied"
-    case .permanentlyDenied:
-      return "permanently_denied"
-    case .alreadyGranted:
-      return "already_granted"
-    case .notRequired:
-      return "not_required"
-    }
+  private func permissionResultToString(_ result: String) -> String {
+    return result
   }
 
   // MARK: - Method Handling
@@ -211,6 +199,8 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       handleTrackScreen(call, result: result)
     case "showFlow":
       handleShowFlow(call, result: result)
+    case "getAnonymousId":
+      result(Setgreet.shared.anonymousId)
     default:
       result(FlutterMethodNotImplemented)
     }
@@ -231,8 +221,10 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     let debugMode = args["debugMode"] as? Bool ?? false
     let config = SetgreetConfig(debugMode: debugMode)
 
-    Setgreet.shared.initialize(appKey: appKey, config: config)
-    setupFlowCallbacks()
+    DispatchQueue.main.async { [weak self] in
+      Setgreet.shared.initialize(appKey: appKey, config: config)
+      self?.setupFlowCallbacks()
+    }
     result(nil)
   }
 
@@ -252,7 +244,7 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     let operation = args["operation"] as? String
     let locale = args["locale"] as? String
 
-    let op: Operation = (operation?.lowercased() == "update") ? .update : .create
+    let op: SetgreetSDK.Operation = (operation?.lowercased() == "update") ? .update : .create
 
     Setgreet.shared.identifyUser(
       userId: userId,
@@ -314,7 +306,9 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       return
     }
 
-    Setgreet.shared.showFlow(flowId: flowId)
+    DispatchQueue.main.async {
+      Setgreet.shared.showFlow(flowId: flowId)
+    }
     result(nil)
   }
 }

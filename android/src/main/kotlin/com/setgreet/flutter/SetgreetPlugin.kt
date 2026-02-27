@@ -150,6 +150,9 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     DismissReason.BACK_PRESS -> "backPress"
     DismissReason.REPLACED -> "replaced"
     DismissReason.PROGRAMMATIC -> "programmatic"
+    DismissReason.SWIPE_DOWN -> "swipeDown"
+    DismissReason.COMPLETED -> "completed"
+    DismissReason.REMIND_LATER -> "remindLater"
   }
 
   private fun ErrorType.toFlutterString(): String = when (this) {
@@ -256,6 +259,9 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
         } catch (e: Exception) {
           result.error("FLOW_ERROR", e.message ?: "Failed to show flow", null)
         }
+      }
+      "getAnonymousId" -> {
+        result.success(Setgreet.anonymousId)
       }
       else -> {
         result.notImplemented()
