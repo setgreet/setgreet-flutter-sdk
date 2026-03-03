@@ -1,0 +1,49 @@
+name: Update Native SDK Dependency
+
+on:
+  repository_dispatch:
+    types: [android-sdk-release, ios-sdk-release]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract platform and version
+        id: info
+        run: |
+          VERSION="${{ github.event.client_payload.version }}"
+          EVENT_TYPE="${{ github.event.action }}"
+          if [ "$EVENT_TYPE" = "android-sdk-release" ]; then
+            PLATFORM="android"
+          else
+            PLATFORM="ios"
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "PLATFORM=$PLATFORM" >> "$GITHUB_OUTPUT"
+
+      - name: Update Android dependency
+        if: steps.info.outputs.PLATFORM == 'android'
+        run: |
+          sed -i "s/implementation 'com.setgreet:setgreet:[^']*'/implementation 'com.setgreet:setgreet:${{ steps.info.outputs.VERSION }}'/" android/build.gradle
+
+      - name: Update iOS dependency
+        if: steps.info.outputs.PLATFORM == 'ios'
+        run: |
+          sed -i "s/s.dependency 'SetgreetSDK', '[^']*'/s.dependency 'SetgreetSDK', '${{ steps.info.outputs.VERSION }}'/" ios/setgreet.podspec
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/update-${{ steps.info.outputs.PLATFORM }}-sdk-${{ steps.info.outputs.VERSION }}
+          commit-message: "chore: update ${{ steps.info.outputs.PLATFORM }} native SDK to ${{ steps.info.outputs.VERSION }}"
+          title: "chore: update ${{ steps.info.outputs.PLATFORM }} native SDK to ${{ steps.info.outputs.VERSION }}"
+          body: |
+            Automated update of ${{ steps.info.outputs.PLATFORM }} native SDK dependency to version `${{ steps.info.outputs.VERSION }}`.
+
+            Triggered by a new release in the source SDK repository.
+
+            > Review whether Dart/platform channel code changes are needed for new native APIs before merging.
