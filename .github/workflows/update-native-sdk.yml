@@ -8,8 +8,10 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout develop
         uses: actions/checkout@v4
+        with:
+          ref: develop
 
       - name: Extract platform and version
         id: info
@@ -38,6 +40,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          base: develop
           branch: chore/update-${{ steps.info.outputs.PLATFORM }}-sdk-${{ steps.info.outputs.VERSION }}
           commit-message: "chore: update ${{ steps.info.outputs.PLATFORM }} native SDK to ${{ steps.info.outputs.VERSION }}"
           title: "chore: update ${{ steps.info.outputs.PLATFORM }} native SDK to ${{ steps.info.outputs.VERSION }}"
