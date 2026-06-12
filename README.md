@@ -71,6 +71,23 @@ void main() async {
 }
 ```
 
+### Theme sync
+
+`Setgreet.initialize` forwards to the native Android and iOS SDKs, which
+automatically sync your app's theme (colors, typography) to the Setgreet
+dashboard at startup so generated flows match your brand. There is nothing
+to call from Dart — it happens for you.
+
+The sync is fire-and-forget and gated client-side: it only sends when the
+theme changes, the app version changes, or a 7-day TTL elapses, so most
+launches do no extra network work.
+
+> **Availability:** theme sync ships in the native SDKs from version
+> **1.0.3**. This plugin currently pins the native SDKs at `1.0.2`, so theme
+> sync activates once those dependencies are bumped to `1.0.3+` in a future
+> release of this plugin. Until then, set your theme manually in the
+> dashboard Brand tab.
+
 ### Identify User
 
 Identifies a user for Setgreet analytics and flow management.
