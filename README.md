@@ -73,20 +73,27 @@ void main() async {
 
 ### Theme sync
 
-`Setgreet.initialize` forwards to the native Android and iOS SDKs, which
-automatically sync your app's theme (colors, typography) to the Setgreet
-dashboard at startup so generated flows match your brand. There is nothing
-to call from Dart — it happens for you.
+Sync your app's theme (colors + typography) to Setgreet so generated flows
+match your brand. A Flutter app draws its UI from its own `ThemeData`, which
+the native SDKs can't see — their auto-sync reads the host platform theme
+(iOS system colors / the Android Activity theme), which for a Flutter app is
+just framework defaults. So Flutter syncs its `ThemeData` explicitly:
 
-The sync is fire-and-forget and gated client-side: it only sends when the
-theme changes, the app version changes, or a 7-day TTL elapses, so most
-launches do no extra network work.
+```dart
+import 'package:flutter/material.dart';
+import 'package:setgreet/setgreet.dart';
 
-> **Availability:** theme sync ships in the native SDKs from version
-> **1.0.3**. This plugin currently pins the native SDKs at `1.0.2`, so theme
-> sync activates once those dependencies are bumped to `1.0.3+` in a future
-> release of this plugin. Until then, set your theme manually in the
-> dashboard Brand tab.
+// Call from a widget below MaterialApp (so Theme.of resolves your app theme),
+// e.g. once after the first frame.
+WidgetsBinding.instance.addPostFrameCallback((_) {
+  Setgreet.syncTheme(context); // extracts ColorScheme + TextTheme, posts to Setgreet
+});
+```
+
+`syncTheme` reads the current Material 3 `ColorScheme` and `TextTheme` from the
+`BuildContext` and posts them to `POST /sdk/sync-theme`. It throws
+`SetgreetThemeException` on failure. Point it at a non-production backend by
+passing `apiUrl` in `SetgreetConfig` at `initialize` time.
 
 ### Identify User
 

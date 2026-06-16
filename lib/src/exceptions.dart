@@ -40,3 +40,10 @@ class SetgreetFlowException extends SetgreetException {
   SetgreetFlowException(String message, {String? code})
       : super(message, code: code);
 }
+
+/// Exception thrown when theme sync fails
+class SetgreetThemeException extends SetgreetException {
+  /// Creates a new SetgreetThemeException
+  SetgreetThemeException(String message, {String? code})
+      : super(message, code: code);
+}

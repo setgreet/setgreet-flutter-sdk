@@ -1,19 +1,32 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'config.dart';
 import 'exceptions.dart';
 import 'flow_events.dart';
 import 'flow_callbacks.dart';
+import 'theme_extractor.dart';
+import 'theme_sync_api.dart';
 
 /// Main Setgreet SDK class
 class Setgreet {
   static const MethodChannel _channel = MethodChannel('setgreet');
   static const EventChannel _eventChannel = EventChannel('setgreet/events');
 
+  /// Default Setgreet API base URL (matches the native SDKs' production host).
+  static const String _defaultApiUrl = 'https://api.setgreet.com/api/v1';
+
   static bool _initialized = false;
   static SetgreetFlowCallbacks? _callbacks;
   static StreamSubscription? _eventSubscription;
+
+  static String? _appKey;
+  static String _apiUrl = _defaultApiUrl;
+
+  /// @visibleForTesting — the API client used by [syncTheme]. Swappable so tests
+  /// can assert the request without real network I/O.
+  static ThemeSyncApi themeSyncApi = const ThemeSyncApi();
 
   /// Initialize the Setgreet SDK with your app key
   ///
@@ -27,11 +40,14 @@ class Setgreet {
         throw SetgreetInitializationException('App key cannot be empty');
       }
 
-      final configMap = (config ?? const SetgreetConfig()).toMap();
+      final resolvedConfig = config ?? const SetgreetConfig();
+      final configMap = resolvedConfig.toMap();
       configMap['appKey'] = appKey;
 
       await _channel.invokeMethod('initialize', configMap);
       _initialized = true;
+      _appKey = appKey;
+      _apiUrl = resolvedConfig.apiUrl ?? _defaultApiUrl;
 
       // Start listening for flow events
       _startEventListener();
@@ -197,6 +213,34 @@ class Setgreet {
         code: e.code,
       );
     }
+  }
+
+  /// Sync the app's Material theme with Setgreet.
+  ///
+  /// Extracts the current Material 3 [ColorScheme] and [TextTheme] from the
+  /// given [context] and posts them to the Setgreet backend, so flows render
+  /// with matching colors and typography.
+  ///
+  /// Flutter must do this explicitly: the native SDKs auto-sync the HOST
+  /// platform theme (UIKit system colors / the Android Activity theme), which
+  /// for a Flutter app is framework defaults — not the app's [ThemeData].
+  ///
+  /// Call from a widget below [MaterialApp] (so [Theme.of] resolves the app
+  /// theme), e.g. in a post-frame callback or after the first build.
+  ///
+  /// Throws [SetgreetThemeException] if the sync request fails.
+  static Future<void> syncTheme(BuildContext context) async {
+    _ensureInitialized();
+
+    final colors = ThemeExtractor.extractColors(context);
+    final typography = ThemeExtractor.extractTypography(context);
+
+    await themeSyncApi.sync(
+      apiUrl: _apiUrl,
+      appKey: _appKey!,
+      colors: colors,
+      typography: typography,
+    );
   }
 
   // MARK: - Flow Event Callbacks
