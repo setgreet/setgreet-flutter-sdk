@@ -296,6 +296,21 @@ Setgreet.flowEvents.listen((event) {
 | `alreadyGranted` | Permission was already granted |
 | `notRequired` | Permission request was not required |
 
+## External Data in Flows
+
+Flows can render data fetched from **your own** API — a product list filtered by answers the user gave earlier in the same flow. You register the endpoint once in the Setgreet dashboard (Data Sources), bind it into a screen, and it renders.
+
+**Nothing to do on the Flutter side.** The feature needs no code, no new permission and no new dependency in your app.
+
+What is worth knowing:
+
+- **Use plugin 1.2.0 or newer.** On an older version the screen renders without its data rather than failing.
+- **Setgreet calls your API from its servers, not from the device**, so your endpoint must be reachable over HTTPS from the public internet. Setgreet signs each request and asserts the end user's id; verify the signature on your side.
+- **A failure degrades, it does not blank.** If your API is slow or down, the screen renders without the data-bound parts. Only if the flow author explicitly chose "skip screen" is it passed over.
+- **Answers reach your API by input name.** An input named `goal` in the editor arrives as `goal`. Attributes you set via `identifyUser` are available to it too.
+
+See [External Data](https://setgreet.com/docs/personalization/external-data) for the endpoint contract and the signature-verification recipe.
+
 ## Permissions Setup
 
 If your flows use permission buttons, add the required keys to your `Info.plist` (iOS):
