@@ -85,7 +85,16 @@ enum PermissionType {
   location,
 
   /// Camera access permission
-  camera;
+  camera,
+
+  /// App Tracking Transparency (iOS only; reported as notRequired on Android)
+  tracking,
+
+  /// Microphone access permission
+  microphone,
+
+  /// Photo library read access
+  photoLibrary;
 
   static PermissionType fromString(String value) {
     switch (value) {
@@ -95,6 +104,12 @@ enum PermissionType {
         return PermissionType.location;
       case 'camera':
         return PermissionType.camera;
+      case 'tracking':
+        return PermissionType.tracking;
+      case 'microphone':
+        return PermissionType.microphone;
+      case 'photoLibrary':
+        return PermissionType.photoLibrary;
       default:
         return PermissionType.notification;
     }
