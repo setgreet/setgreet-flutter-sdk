@@ -1,3 +1,5 @@
+import 'purchases.dart';
+
 /// Reasons why a flow may be dismissed before completion.
 enum DismissReason {
   /// User tapped the close button
@@ -221,10 +223,93 @@ sealed class SetgreetFlowEvent {
           screenIndex: map['screenIndex'] as int,
           timestamp: timestamp,
         );
+      case 'purchaseCompleted':
+        return PurchaseCompletedEvent(
+          flowId: flowId,
+          screenId: map['screenId'] as String,
+          componentId: map['componentId'] as String,
+          productRef: map['productRef'] as String,
+          provider: map['provider'] as String,
+          accessRefs: _stringList(map['accessRefs']),
+          timestamp: timestamp,
+        );
+      case 'purchaseCancelled':
+        return PurchaseCancelledEvent(
+          flowId: flowId,
+          screenId: map['screenId'] as String,
+          componentId: map['componentId'] as String,
+          productRef: map['productRef'] as String,
+          provider: map['provider'] as String,
+          timestamp: timestamp,
+        );
+      case 'purchaseFailed':
+        return PurchaseFailedEvent(
+          flowId: flowId,
+          screenId: map['screenId'] as String,
+          componentId: map['componentId'] as String,
+          productRef: map['productRef'] as String,
+          provider: map['provider'] as String,
+          error: _purchaseError(map['error']),
+          timestamp: timestamp,
+        );
+      case 'purchasePending':
+        return PurchasePendingEvent(
+          flowId: flowId,
+          screenId: map['screenId'] as String,
+          componentId: map['componentId'] as String,
+          productRef: map['productRef'] as String,
+          provider: map['provider'] as String,
+          timestamp: timestamp,
+        );
+      case 'restoreCompleted':
+        return RestoreCompletedEvent(
+          flowId: flowId,
+          screenId: map['screenId'] as String,
+          componentId: map['componentId'] as String,
+          provider: map['provider'] as String,
+          status: _restoreStatus(map['status']),
+          accessRefs: _stringList(map['accessRefs']),
+          timestamp: timestamp,
+        );
+      case 'restoreFailed':
+        return RestoreFailedEvent(
+          flowId: flowId,
+          screenId: map['screenId'] as String,
+          componentId: map['componentId'] as String,
+          provider: map['provider'] as String,
+          error: _purchaseError(map['error']),
+          timestamp: timestamp,
+        );
       default:
         throw ArgumentError('Unknown event type: $type');
     }
   }
+}
+
+List<String> _stringList(Object? value) =>
+    value is List ? value.whereType<String>().toList() : const <String>[];
+
+/// The `error` of a purchase event: `{code, providerCode, message}`. An
+/// unrecognized or missing code is `unknown`.
+SetgreetPurchaseError _purchaseError(Object? value) {
+  if (value is! Map) {
+    return const SetgreetPurchaseError(code: SetgreetPurchaseErrorCode.unknown);
+  }
+  final code = value['code'];
+  final providerCode = value['providerCode'];
+  final message = value['message'];
+  return SetgreetPurchaseError(
+    code: SetgreetPurchaseErrorCode.fromRawValue(code is String ? code : null),
+    providerCode: providerCode is String ? providerCode : null,
+    message: message is String ? message : null,
+  );
+}
+
+SetgreetRestoreStatus _restoreStatus(Object? value) {
+  for (final status in SetgreetRestoreStatus.values) {
+    if (status.rawValue == value) return status;
+  }
+  throw ArgumentError('Unknown restore status: $value');
 }
 
 /// Emitted when a flow starts presenting to the user.
@@ -381,4 +466,186 @@ class PermissionRequestedEvent extends SetgreetFlowEvent {
   @override
   String toString() =>
       'PermissionRequestedEvent(flowId: $flowId, permissionType: $permissionType, result: $result)';
+}
+
+/// Emitted when a purchase through the registered purchase provider
+/// succeeded.
+class PurchaseCompletedEvent extends SetgreetFlowEvent {
+  /// The paywall screen
+  final String screenId;
+
+  /// The purchase button
+  final String componentId;
+
+  /// The product ref that was bought
+  final String productRef;
+
+  /// The provider's `providerId`, e.g. "revenuecat"
+  final String provider;
+
+  /// The access (entitlement) refs the user now holds
+  final List<String> accessRefs;
+
+  const PurchaseCompletedEvent({
+    required super.flowId,
+    required this.screenId,
+    required this.componentId,
+    required this.productRef,
+    required this.provider,
+    required this.accessRefs,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'PurchaseCompletedEvent(flowId: $flowId, productRef: $productRef, accessRefs: $accessRefs)';
+}
+
+/// Emitted when the user cancelled a purchase.
+class PurchaseCancelledEvent extends SetgreetFlowEvent {
+  /// The paywall screen
+  final String screenId;
+
+  /// The purchase button
+  final String componentId;
+
+  /// The product ref the user was buying
+  final String productRef;
+
+  /// The provider's `providerId`, e.g. "revenuecat"
+  final String provider;
+
+  const PurchaseCancelledEvent({
+    required super.flowId,
+    required this.screenId,
+    required this.componentId,
+    required this.productRef,
+    required this.provider,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'PurchaseCancelledEvent(flowId: $flowId, productRef: $productRef)';
+}
+
+/// Emitted when a purchase failed.
+class PurchaseFailedEvent extends SetgreetFlowEvent {
+  /// The paywall screen
+  final String screenId;
+
+  /// The purchase button
+  final String componentId;
+
+  /// The product ref the user was buying
+  final String productRef;
+
+  /// The provider's `providerId`, e.g. "revenuecat"
+  final String provider;
+
+  /// The normalized error, with the vendor's own code and message when known
+  final SetgreetPurchaseError error;
+
+  const PurchaseFailedEvent({
+    required super.flowId,
+    required this.screenId,
+    required this.componentId,
+    required this.productRef,
+    required this.provider,
+    required this.error,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'PurchaseFailedEvent(flowId: $flowId, productRef: $productRef, error: $error)';
+}
+
+/// Emitted when a purchase is pending approval (Ask to Buy, a deferred
+/// payment).
+class PurchasePendingEvent extends SetgreetFlowEvent {
+  /// The paywall screen
+  final String screenId;
+
+  /// The purchase button
+  final String componentId;
+
+  /// The product ref the user was buying
+  final String productRef;
+
+  /// The provider's `providerId`, e.g. "revenuecat"
+  final String provider;
+
+  const PurchasePendingEvent({
+    required super.flowId,
+    required this.screenId,
+    required this.componentId,
+    required this.productRef,
+    required this.provider,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'PurchasePendingEvent(flowId: $flowId, productRef: $productRef)';
+}
+
+/// Emitted when a restore finished, with or without something to restore.
+class RestoreCompletedEvent extends SetgreetFlowEvent {
+  /// The paywall screen
+  final String screenId;
+
+  /// The restore button
+  final String componentId;
+
+  /// The provider's `providerId`, e.g. "revenuecat"
+  final String provider;
+
+  /// [SetgreetRestoreStatus.restored] or
+  /// [SetgreetRestoreStatus.nothingToRestore]
+  final SetgreetRestoreStatus status;
+
+  /// The access (entitlement) refs the user now holds
+  final List<String> accessRefs;
+
+  const RestoreCompletedEvent({
+    required super.flowId,
+    required this.screenId,
+    required this.componentId,
+    required this.provider,
+    required this.status,
+    required this.accessRefs,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'RestoreCompletedEvent(flowId: $flowId, status: ${status.rawValue}, accessRefs: $accessRefs)';
+}
+
+/// Emitted when a restore failed.
+class RestoreFailedEvent extends SetgreetFlowEvent {
+  /// The paywall screen
+  final String screenId;
+
+  /// The restore button
+  final String componentId;
+
+  /// The provider's `providerId`, e.g. "revenuecat"
+  final String provider;
+
+  /// The normalized error, with the vendor's own code and message when known
+  final SetgreetPurchaseError error;
+
+  const RestoreFailedEvent({
+    required super.flowId,
+    required this.screenId,
+    required this.componentId,
+    required this.provider,
+    required this.error,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() => 'RestoreFailedEvent(flowId: $flowId, error: $error)';
 }

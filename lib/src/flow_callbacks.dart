@@ -9,6 +9,12 @@ typedef ActionTriggeredCallback = void Function(ActionTriggeredEvent event);
 typedef PermissionRequestedCallback = void Function(
     PermissionRequestedEvent event);
 typedef FlowErrorCallback = void Function(FlowErrorEvent event);
+typedef PurchaseCompletedCallback = void Function(PurchaseCompletedEvent event);
+typedef PurchaseCancelledCallback = void Function(PurchaseCancelledEvent event);
+typedef PurchaseFailedCallback = void Function(PurchaseFailedEvent event);
+typedef PurchasePendingCallback = void Function(PurchasePendingEvent event);
+typedef RestoreCompletedCallback = void Function(RestoreCompletedEvent event);
+typedef RestoreFailedCallback = void Function(RestoreFailedEvent event);
 
 /// Container for flow event callbacks using builder pattern.
 ///
@@ -42,6 +48,12 @@ class SetgreetFlowCallbacks {
   ActionTriggeredCallback? _onActionTriggered;
   PermissionRequestedCallback? _onPermissionRequested;
   FlowErrorCallback? _onError;
+  PurchaseCompletedCallback? _onPurchaseCompleted;
+  PurchaseCancelledCallback? _onPurchaseCancelled;
+  PurchaseFailedCallback? _onPurchaseFailed;
+  PurchasePendingCallback? _onPurchasePending;
+  RestoreCompletedCallback? _onRestoreCompleted;
+  RestoreFailedCallback? _onRestoreFailed;
 
   /// Register a callback for when a flow starts presenting.
   SetgreetFlowCallbacks onFlowStarted(FlowStartedCallback callback) {
@@ -86,6 +98,46 @@ class SetgreetFlowCallbacks {
     return this;
   }
 
+  /// Register a callback for when a purchase through the registered purchase
+  /// provider succeeded.
+  SetgreetFlowCallbacks onPurchaseCompleted(
+      PurchaseCompletedCallback callback) {
+    _onPurchaseCompleted = callback;
+    return this;
+  }
+
+  /// Register a callback for when the user cancelled a purchase.
+  SetgreetFlowCallbacks onPurchaseCancelled(
+      PurchaseCancelledCallback callback) {
+    _onPurchaseCancelled = callback;
+    return this;
+  }
+
+  /// Register a callback for when a purchase failed.
+  SetgreetFlowCallbacks onPurchaseFailed(PurchaseFailedCallback callback) {
+    _onPurchaseFailed = callback;
+    return this;
+  }
+
+  /// Register a callback for when a purchase is pending approval.
+  SetgreetFlowCallbacks onPurchasePending(PurchasePendingCallback callback) {
+    _onPurchasePending = callback;
+    return this;
+  }
+
+  /// Register a callback for when a restore finished; `status` says whether
+  /// anything was restored.
+  SetgreetFlowCallbacks onRestoreCompleted(RestoreCompletedCallback callback) {
+    _onRestoreCompleted = callback;
+    return this;
+  }
+
+  /// Register a callback for when a restore failed.
+  SetgreetFlowCallbacks onRestoreFailed(RestoreFailedCallback callback) {
+    _onRestoreFailed = callback;
+    return this;
+  }
+
   /// Dispatch an event to the appropriate callback.
   void dispatchEvent(SetgreetFlowEvent event) {
     switch (event) {
@@ -103,6 +155,18 @@ class SetgreetFlowCallbacks {
         _onPermissionRequested?.call(event);
       case FlowErrorEvent():
         _onError?.call(event);
+      case PurchaseCompletedEvent():
+        _onPurchaseCompleted?.call(event);
+      case PurchaseCancelledEvent():
+        _onPurchaseCancelled?.call(event);
+      case PurchaseFailedEvent():
+        _onPurchaseFailed?.call(event);
+      case PurchasePendingEvent():
+        _onPurchasePending?.call(event);
+      case RestoreCompletedEvent():
+        _onRestoreCompleted?.call(event);
+      case RestoreFailedEvent():
+        _onRestoreFailed?.call(event);
     }
   }
 }
