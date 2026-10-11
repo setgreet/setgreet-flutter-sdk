@@ -49,7 +49,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.setgreet:setgreet:1.6.0'
+    implementation 'com.setgreet:setgreet:1.7.0'
 
     // JVM unit tests of the purchase bridge (src/test/kotlin).
     testImplementation 'junit:junit:4.13.2'
