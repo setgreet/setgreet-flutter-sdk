@@ -6,8 +6,8 @@ Setgreet Flutter SDK allows you to show Setgreet flows in your Flutter app.
 
 ## Requirements
 
-- Flutter: >=3.0.0
-- Dart: >=3.0.0
+- Flutter: >=3.27.0
+- Dart: >=3.6.0
 - Android: minSdkVersion 23
 - iOS: 15.0+
 
