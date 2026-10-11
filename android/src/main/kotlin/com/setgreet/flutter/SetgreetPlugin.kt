@@ -34,7 +34,9 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
 
     // Per engine: the native proxy provider reaches this engine's Dart
     // purchase provider through it.
-    purchaseBridge = FlutterPurchaseBridge(MethodChannel(flutterPluginBinding.binaryMessenger, "setgreet/purchases"))
+    purchaseBridge = FlutterPurchaseBridge(
+      FlutterPurchaseChannel(MethodChannel(flutterPluginBinding.binaryMessenger, "setgreet/purchases"))
+    )
   }
 
   override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -169,7 +171,9 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createPurchaseCompletedEvent(event: SetgreetFlowEvent.PurchaseCompleted): Map<String, Any?> {
+  // Purchase events: internal, not private, for the JVM unit tests (src/test).
+
+  internal fun createPurchaseCompletedEvent(event: SetgreetFlowEvent.PurchaseCompleted): Map<String, Any?> {
     return mapOf(
       "type" to "purchaseCompleted",
       "flowId" to event.flowId,
@@ -182,7 +186,7 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createPurchaseCancelledEvent(event: SetgreetFlowEvent.PurchaseCancelled): Map<String, Any?> {
+  internal fun createPurchaseCancelledEvent(event: SetgreetFlowEvent.PurchaseCancelled): Map<String, Any?> {
     return mapOf(
       "type" to "purchaseCancelled",
       "flowId" to event.flowId,
@@ -194,7 +198,7 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createPurchaseFailedEvent(event: SetgreetFlowEvent.PurchaseFailed): Map<String, Any?> {
+  internal fun createPurchaseFailedEvent(event: SetgreetFlowEvent.PurchaseFailed): Map<String, Any?> {
     return mapOf(
       "type" to "purchaseFailed",
       "flowId" to event.flowId,
@@ -207,7 +211,7 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createPurchasePendingEvent(event: SetgreetFlowEvent.PurchasePending): Map<String, Any?> {
+  internal fun createPurchasePendingEvent(event: SetgreetFlowEvent.PurchasePending): Map<String, Any?> {
     return mapOf(
       "type" to "purchasePending",
       "flowId" to event.flowId,
@@ -219,7 +223,7 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createRestoreCompletedEvent(event: SetgreetFlowEvent.RestoreCompleted): Map<String, Any?> {
+  internal fun createRestoreCompletedEvent(event: SetgreetFlowEvent.RestoreCompleted): Map<String, Any?> {
     return mapOf(
       "type" to "restoreCompleted",
       "flowId" to event.flowId,
@@ -232,7 +236,7 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createRestoreFailedEvent(event: SetgreetFlowEvent.RestoreFailed): Map<String, Any?> {
+  internal fun createRestoreFailedEvent(event: SetgreetFlowEvent.RestoreFailed): Map<String, Any?> {
     return mapOf(
       "type" to "restoreFailed",
       "flowId" to event.flowId,

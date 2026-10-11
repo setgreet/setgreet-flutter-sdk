@@ -57,8 +57,16 @@ import kotlin.coroutines.suspendCoroutine
  * Built on the Kotlin standard library's coroutine primitives only:
  * kotlinx.coroutines is not on this plugin's compile classpath (the native
  * SDK keeps it an `implementation` dependency).
+ *
+ * The main thread and the channel are injected ([MainThread],
+ * [PurchaseChannel]) so JVM unit tests can drive the bridge without a Looper
+ * or a Flutter engine; the defaults are the app's main looper and the
+ * `setgreet/purchases` MethodChannel.
  */
-internal class FlutterPurchaseBridge(channel: MethodChannel) {
+internal class FlutterPurchaseBridge(
+  channel: PurchaseChannel,
+  private val mainThread: MainThread = AndroidMainThread()
+) {
 
   private sealed class Reply {
     class Success(val value: Any?) : Reply()
@@ -67,11 +75,10 @@ internal class FlutterPurchaseBridge(channel: MethodChannel) {
     object TimedOut : Reply()
   }
 
-  private val mainHandler = Handler(Looper.getMainLooper())
   private val lock = Any()
 
   /** Null once the engine is detached. Guarded by [lock]. */
-  private var channel: MethodChannel? = channel
+  private var channel: PurchaseChannel? = channel
 
   /** Calls waiting for a Dart reply. Guarded by [lock]. */
   private val pending = LinkedHashSet<PendingCall>()
@@ -148,7 +155,7 @@ internal class FlutterPurchaseBridge(channel: MethodChannel) {
     runOnMain {
       val channel = synchronized(lock) { channel } ?: return@runOnMain
       try {
-        channel.invokeMethod(method, arguments)
+        channel.invokeMethod(method, arguments, result = null)
       } catch (e: Exception) {
         // The engine is going away; nothing is waiting for this call.
       }
@@ -191,7 +198,7 @@ internal class FlutterPurchaseBridge(channel: MethodChannel) {
     /** The first reply wins; later ones are dropped. */
     fun finish(reply: Reply) {
       if (!finished.compareAndSet(false, true)) return
-      mainHandler.removeCallbacks(timeout)
+      mainThread.cancel(timeout)
       synchronized(lock) { pending.remove(this) }
       onReply(reply)
     }
@@ -210,13 +217,13 @@ internal class FlutterPurchaseBridge(channel: MethodChannel) {
         call.finish(Reply.Unavailable("The Flutter engine was detached", PROVIDER_CODE_DETACHED))
         return@runOnMain
       }
-      if (timeoutMs != null) mainHandler.postDelayed(call.timeout, timeoutMs)
+      if (timeoutMs != null) mainThread.postDelayed(call.timeout, timeoutMs)
       try {
-        channel.invokeMethod(method, arguments, object : MethodChannel.Result {
-          override fun success(result: Any?) = call.finish(Reply.Success(result))
+        channel.invokeMethod(method, arguments, object : PurchaseChannelResult {
+          override fun success(value: Any?) = call.finish(Reply.Success(value))
 
-          override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) =
-            call.finish(Reply.Failure(errorCode, errorMessage, errorDetails))
+          override fun error(code: String, message: String?, details: Any?) =
+            call.finish(Reply.Failure(code, message, details))
 
           override fun notImplemented() = call.finish(
             Reply.Unavailable(
@@ -232,7 +239,7 @@ internal class FlutterPurchaseBridge(channel: MethodChannel) {
   }
 
   private fun runOnMain(block: () -> Unit) {
-    if (Looper.myLooper() == Looper.getMainLooper()) block() else mainHandler.post(block)
+    if (mainThread.isCurrent()) block() else mainThread.post(Runnable(block))
   }
 
   companion object {
@@ -379,6 +386,71 @@ internal class FlutterPurchaseBridge(channel: MethodChannel) {
       val active = map["active"] as? Boolean ?: return null
       return SetgreetPurchaseAccessState(active, stringList(map["accessRefs"]))
     }
+  }
+}
+
+/** The thread the bridge invokes Flutter on: the main thread in an app. */
+internal interface MainThread {
+  /** Whether the caller is on that thread. */
+  fun isCurrent(): Boolean
+
+  fun post(task: Runnable)
+
+  fun postDelayed(task: Runnable, delayMs: Long)
+
+  /** Removes [task] if it is still waiting to run. */
+  fun cancel(task: Runnable)
+}
+
+/** The app's main looper. */
+internal class AndroidMainThread : MainThread {
+  private val handler = Handler(Looper.getMainLooper())
+
+  override fun isCurrent(): Boolean = Looper.myLooper() == Looper.getMainLooper()
+
+  override fun post(task: Runnable) {
+    handler.post(task)
+  }
+
+  override fun postDelayed(task: Runnable, delayMs: Long) {
+    handler.postDelayed(task, delayMs)
+  }
+
+  override fun cancel(task: Runnable) {
+    handler.removeCallbacks(task)
+  }
+}
+
+/** The bridge's channel to the Dart provider: `setgreet/purchases` in an app. */
+internal interface PurchaseChannel {
+  /** Invokes [method]; [result] is null for a call nobody waits for. */
+  fun invokeMethod(method: String, arguments: Any?, result: PurchaseChannelResult?)
+}
+
+/** The Dart side's answer, in the shape of `MethodChannel.Result`. */
+internal interface PurchaseChannelResult {
+  fun success(value: Any?)
+
+  fun error(code: String, message: String?, details: Any?)
+
+  fun notImplemented()
+}
+
+/** The `setgreet/purchases` MethodChannel of an engine. */
+internal class FlutterPurchaseChannel(private val channel: MethodChannel) : PurchaseChannel {
+  override fun invokeMethod(method: String, arguments: Any?, result: PurchaseChannelResult?) {
+    if (result == null) {
+      channel.invokeMethod(method, arguments)
+      return
+    }
+    channel.invokeMethod(method, arguments, object : MethodChannel.Result {
+      override fun success(value: Any?) = result.success(value)
+
+      override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) =
+        result.error(errorCode, errorMessage, errorDetails)
+
+      override fun notImplemented() = result.notImplemented()
+    })
   }
 }
 
