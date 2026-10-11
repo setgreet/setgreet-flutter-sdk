@@ -20,6 +20,14 @@ const exampleConfig = ExampleConfig(
     'locale': 'en-US',
     'environment': 'development',
   },
+
+  // Paywalls (optional). Paste your RevenueCat PUBLIC SDK keys here, one per
+  // store. While a key is left as the placeholder, RevenueCat is not
+  // configured on that platform: the provider then reports
+  // `providerNotInitialized` and every paywall screen follows its
+  // `unavailablePolicy` (skipped by default).
+  revenueCatAppleApiKey: 'YOUR_REVENUECAT_APPLE_API_KEY',
+  revenueCatGoogleApiKey: 'YOUR_REVENUECAT_GOOGLE_API_KEY',
 );
 
 /// Configuration class for the example app
@@ -29,6 +37,8 @@ class ExampleConfig {
   final bool debugMode;
   final String testUserId;
   final Map<String, dynamic> testUserAttributes;
+  final String revenueCatAppleApiKey;
+  final String revenueCatGoogleApiKey;
 
   const ExampleConfig({
     required this.appKey,
@@ -36,7 +46,16 @@ class ExampleConfig {
     required this.debugMode,
     required this.testUserId,
     required this.testUserAttributes,
+    required this.revenueCatAppleApiKey,
+    required this.revenueCatGoogleApiKey,
   });
+
+  /// The RevenueCat key for Android ([isAndroid]) or iOS, or null while it is
+  /// still the placeholder.
+  String? revenueCatApiKey(bool isAndroid) {
+    final key = isAndroid ? revenueCatGoogleApiKey : revenueCatAppleApiKey;
+    return key.startsWith('YOUR_') ? null : key;
+  }
 
   /// Validates the configuration
   bool validate() {

@@ -5,13 +5,32 @@ import SetgreetSDK
 public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
 
+  /// This engine's purchase bridge. It keeps the `setgreet/purchases`
+  /// channel the native proxy provider invokes, for as long as the plugin
+  /// instance lives.
+  private let purchaseBridge: FlutterPurchaseBridge
+
+  init(purchaseChannel: FlutterMethodChannel) {
+    self.purchaseBridge = FlutterPurchaseBridge(channel: purchaseChannel)
+    super.init()
+  }
+
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "setgreet", binaryMessenger: registrar.messenger())
     let eventChannel = FlutterEventChannel(name: "setgreet/events", binaryMessenger: registrar.messenger())
+    let purchaseChannel = FlutterMethodChannel(name: "setgreet/purchases", binaryMessenger: registrar.messenger())
 
-    let instance = SetgreetPlugin()
+    let instance = SetgreetPlugin(purchaseChannel: purchaseChannel)
     registrar.addMethodCallDelegate(instance, channel: channel)
     eventChannel.setStreamHandler(instance)
+    // Published so the engine calls `detachFromEngine(for:)` on teardown.
+    registrar.publish(instance)
+  }
+
+  /// A registered provider outlives the engine inside the native SDK: its
+  /// waiting calls get their fallback now, so no paywall button stays locked.
+  public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+    purchaseBridge.detach()
   }
 
   // MARK: - FlutterStreamHandler
@@ -51,6 +70,24 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         }
         .onError { event in
           self?.sendEvent(self?.createFlowErrorEvent(event))
+        }
+        .onPurchaseCompleted { event in
+          self?.sendEvent(self?.createPurchaseCompletedEvent(event))
+        }
+        .onPurchaseCancelled { event in
+          self?.sendEvent(self?.createPurchaseCancelledEvent(event))
+        }
+        .onPurchaseFailed { event in
+          self?.sendEvent(self?.createPurchaseFailedEvent(event))
+        }
+        .onPurchasePending { event in
+          self?.sendEvent(self?.createPurchasePendingEvent(event))
+        }
+        .onRestoreCompleted { event in
+          self?.sendEvent(self?.createRestoreCompletedEvent(event))
+        }
+        .onRestoreFailed { event in
+          self?.sendEvent(self?.createRestoreFailedEvent(event))
         }
     }
   }
@@ -141,6 +178,91 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     ]
   }
 
+  // MARK: - Purchase events (internal, not private: the example's RunnerTests cover them)
+
+  func createPurchaseCompletedEvent(_ event: PurchaseCompletedEvent) -> [String: Any] {
+    return [
+      "type": "purchaseCompleted",
+      "flowId": event.flowId,
+      "screenId": event.screenId,
+      "componentId": event.componentId,
+      "productRef": event.productRef,
+      "provider": event.provider,
+      "accessRefs": event.accessRefs,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func createPurchaseCancelledEvent(_ event: PurchaseCancelledEvent) -> [String: Any] {
+    return [
+      "type": "purchaseCancelled",
+      "flowId": event.flowId,
+      "screenId": event.screenId,
+      "componentId": event.componentId,
+      "productRef": event.productRef,
+      "provider": event.provider,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func createPurchaseFailedEvent(_ event: PurchaseFailedEvent) -> [String: Any] {
+    return [
+      "type": "purchaseFailed",
+      "flowId": event.flowId,
+      "screenId": event.screenId,
+      "componentId": event.componentId,
+      "productRef": event.productRef,
+      "provider": event.provider,
+      "error": purchaseErrorToDictionary(event.error),
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func createPurchasePendingEvent(_ event: PurchasePendingEvent) -> [String: Any] {
+    return [
+      "type": "purchasePending",
+      "flowId": event.flowId,
+      "screenId": event.screenId,
+      "componentId": event.componentId,
+      "productRef": event.productRef,
+      "provider": event.provider,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func createRestoreCompletedEvent(_ event: RestoreCompletedEvent) -> [String: Any] {
+    return [
+      "type": "restoreCompleted",
+      "flowId": event.flowId,
+      "screenId": event.screenId,
+      "componentId": event.componentId,
+      "provider": event.provider,
+      "status": event.status.rawValue,
+      "accessRefs": event.accessRefs,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func createRestoreFailedEvent(_ event: RestoreFailedEvent) -> [String: Any] {
+    return [
+      "type": "restoreFailed",
+      "flowId": event.flowId,
+      "screenId": event.screenId,
+      "componentId": event.componentId,
+      "provider": event.provider,
+      "error": purchaseErrorToDictionary(event.error),
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func purchaseErrorToDictionary(_ error: SetgreetPurchaseError) -> [String: Any] {
+    return [
+      "code": error.code.rawValue,
+      "providerCode": error.providerCode.map { $0 as Any } ?? NSNull(),
+      "message": error.message.map { $0 as Any } ?? NSNull()
+    ]
+  }
+
   private func dismissReasonToString(_ reason: DismissReason) -> String {
     switch reason {
     case .userClose:
@@ -159,6 +281,9 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       return "completed"
     case .remindLater:
       return "remindLater"
+    @unknown default:
+      // A reason added in a later SDK: the Dart parser's own fallback.
+      return "userClose"
     }
   }
 
@@ -171,6 +296,8 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     case .display:
       return "display"
     case .unknown:
+      return "unknown"
+    @unknown default:
       return "unknown"
     }
   }
@@ -201,6 +328,8 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       handleShowFlow(call, result: result)
     case "getAnonymousId":
       result(Setgreet.shared.anonymousId)
+    case "setPurchaseProvider":
+      handleSetPurchaseProvider(call, result: result)
     default:
       result(FlutterMethodNotImplemented)
     }
@@ -291,6 +420,29 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
 
     let properties = args["properties"] as? [String: Any]
     Setgreet.shared.trackScreen(screenName: screenName, properties: properties)
+    result(nil)
+  }
+
+  private func handleSetPurchaseProvider(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let args = call.arguments as? [String: Any],
+          let providerId = args["providerId"] as? String,
+          !providerId.isEmpty else {
+      result(FlutterError(code: "INVALID_ARGUMENT", message: "Provider ID cannot be empty", details: nil))
+      return
+    }
+
+    let defaultSource = FlutterPurchaseBridge.decodeSource(args["defaultSource"]) ?? .currentOffering
+    if args["firstInIsolate"] as? Bool == true {
+      // A hot restart: calls still waiting went to the old isolate. Dev only,
+      // and not airtight: a call that reached the new isolate after its Dart
+      // handler was set but before this registration arrived is answered
+      // with the fallback too.
+      purchaseBridge.retirePendingCalls()
+    }
+    Setgreet.shared.setPurchaseProvider(
+      FlutterPurchaseProvider(providerId: providerId, bridge: purchaseBridge),
+      defaultSource: defaultSource
+    )
     result(nil)
   }
 

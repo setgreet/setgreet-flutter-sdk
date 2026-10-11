@@ -12,12 +12,15 @@ import com.setgreet.listener.DismissReason
 import com.setgreet.listener.ErrorType
 import com.setgreet.listener.SetgreetFlowEvent
 import com.setgreet.model.SetgreetConfig
+import com.setgreet.purchases.SetgreetPurchaseError
+import com.setgreet.purchases.SetgreetPurchaseSource
 
 /** SetgreetPlugin */
 class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler {
   private lateinit var channel: MethodChannel
   private lateinit var eventChannel: EventChannel
   private lateinit var context: android.content.Context
+  private lateinit var purchaseBridge: FlutterPurchaseBridge
   private var eventSink: EventChannel.EventSink? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -28,6 +31,12 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     eventChannel.setStreamHandler(this)
 
     context = flutterPluginBinding.applicationContext
+
+    // Per engine: the native proxy provider reaches this engine's Dart
+    // purchase provider through it.
+    purchaseBridge = FlutterPurchaseBridge(
+      FlutterPurchaseChannel(MethodChannel(flutterPluginBinding.binaryMessenger, "setgreet/purchases"))
+    )
   }
 
   override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -60,6 +69,24 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
       }
       onError { event ->
         sendEvent(createFlowErrorEvent(event))
+      }
+      onPurchaseCompleted { event ->
+        sendEvent(createPurchaseCompletedEvent(event))
+      }
+      onPurchaseCancelled { event ->
+        sendEvent(createPurchaseCancelledEvent(event))
+      }
+      onPurchaseFailed { event ->
+        sendEvent(createPurchaseFailedEvent(event))
+      }
+      onPurchasePending { event ->
+        sendEvent(createPurchasePendingEvent(event))
+      }
+      onRestoreCompleted { event ->
+        sendEvent(createRestoreCompletedEvent(event))
+      }
+      onRestoreFailed { event ->
+        sendEvent(createRestoreFailedEvent(event))
       }
     }
   }
@@ -143,6 +170,89 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
       "timestamp" to event.timestamp.toDouble()
     )
   }
+
+  // Purchase events: internal, not private, for the JVM unit tests (src/test).
+
+  internal fun createPurchaseCompletedEvent(event: SetgreetFlowEvent.PurchaseCompleted): Map<String, Any?> {
+    return mapOf(
+      "type" to "purchaseCompleted",
+      "flowId" to event.flowId,
+      "screenId" to event.screenId,
+      "componentId" to event.componentId,
+      "productRef" to event.productRef,
+      "provider" to event.provider,
+      "accessRefs" to event.accessRefs,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createPurchaseCancelledEvent(event: SetgreetFlowEvent.PurchaseCancelled): Map<String, Any?> {
+    return mapOf(
+      "type" to "purchaseCancelled",
+      "flowId" to event.flowId,
+      "screenId" to event.screenId,
+      "componentId" to event.componentId,
+      "productRef" to event.productRef,
+      "provider" to event.provider,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createPurchaseFailedEvent(event: SetgreetFlowEvent.PurchaseFailed): Map<String, Any?> {
+    return mapOf(
+      "type" to "purchaseFailed",
+      "flowId" to event.flowId,
+      "screenId" to event.screenId,
+      "componentId" to event.componentId,
+      "productRef" to event.productRef,
+      "provider" to event.provider,
+      "error" to event.error.toFlutterMap(),
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createPurchasePendingEvent(event: SetgreetFlowEvent.PurchasePending): Map<String, Any?> {
+    return mapOf(
+      "type" to "purchasePending",
+      "flowId" to event.flowId,
+      "screenId" to event.screenId,
+      "componentId" to event.componentId,
+      "productRef" to event.productRef,
+      "provider" to event.provider,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createRestoreCompletedEvent(event: SetgreetFlowEvent.RestoreCompleted): Map<String, Any?> {
+    return mapOf(
+      "type" to "restoreCompleted",
+      "flowId" to event.flowId,
+      "screenId" to event.screenId,
+      "componentId" to event.componentId,
+      "provider" to event.provider,
+      "status" to event.status.rawValue,
+      "accessRefs" to event.accessRefs,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createRestoreFailedEvent(event: SetgreetFlowEvent.RestoreFailed): Map<String, Any?> {
+    return mapOf(
+      "type" to "restoreFailed",
+      "flowId" to event.flowId,
+      "screenId" to event.screenId,
+      "componentId" to event.componentId,
+      "provider" to event.provider,
+      "error" to event.error.toFlutterMap(),
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  private fun SetgreetPurchaseError.toFlutterMap(): Map<String, Any?> = mapOf(
+    "code" to code.rawValue,
+    "providerCode" to providerCode,
+    "message" to message
+  )
 
   private fun DismissReason.toFlutterString(): String = when (this) {
     DismissReason.USER_CLOSE -> "userClose"
@@ -263,6 +373,30 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
       "getAnonymousId" -> {
         result.success(Setgreet.anonymousId)
       }
+      "setPurchaseProvider" -> {
+        try {
+          val providerId = call.argument<String>("providerId")
+
+          if (providerId == null || providerId.isEmpty()) {
+            result.error("INVALID_ARGUMENT", "Provider ID cannot be empty", null)
+            return
+          }
+
+          val defaultSource = FlutterPurchaseBridge.decodeSource(call.argument<Any>("defaultSource"))
+            ?: SetgreetPurchaseSource.currentOffering
+          if (call.argument<Boolean>("firstInIsolate") == true) {
+            // A hot restart: calls still waiting went to the old isolate. Dev
+            // only, and not airtight: a call that reached the new isolate after
+            // its Dart handler was set but before this registration arrived is
+            // answered with the fallback too.
+            purchaseBridge.retirePendingCalls()
+          }
+          Setgreet.setPurchaseProvider(FlutterPurchaseProvider(providerId, purchaseBridge), defaultSource)
+          result.success(null)
+        } catch (e: Exception) {
+          result.error("PURCHASE_ERROR", e.message ?: "Failed to register the purchase provider", null)
+        }
+      }
       else -> {
         result.notImplemented()
       }
@@ -272,5 +406,8 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
     eventChannel.setStreamHandler(null)
+    // A registered provider outlives the engine inside the native SDK: its
+    // waiting calls get their fallback now, so no paywall button stays locked.
+    purchaseBridge.detach()
   }
 }

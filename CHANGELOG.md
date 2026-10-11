@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-11
+
+This release carries the version of the native SDKs it bundles (1.6.0), which shipped the same new purchase events as a minor release.
+
+### Added
+
+- Purchases and paywalls: `Setgreet.setPurchaseProvider` registers a `SetgreetPurchaseProvider` that your app implements in Dart on top of the purchase tool it already uses (RevenueCat, Adapty, StoreKit, Google Play Billing). Paywall screens load products, purchase, restore and branch on the outcome through it.
+- Purchase events: `onPurchaseCompleted`, `onPurchaseCancelled`, `onPurchaseFailed`, `onPurchasePending`, `onRestoreCompleted` and `onRestoreFailed` callbacks, with matching `SetgreetFlowEvent` subclasses on `Setgreet.flowEvents`.
+- A copy-paste RevenueCat reference provider in the example app (`example/lib/setgreet_revenuecat_provider.dart`, for `purchases_flutter` 10.3.0 or later).
+
+### Breaking Changes
+
+- `SetgreetFlowEvent` has six new subclasses (`PurchaseCompletedEvent`, `PurchaseCancelledEvent`, `PurchaseFailedEvent`, `PurchasePendingEvent`, `RestoreCompletedEvent`, `RestoreFailedEvent`). An exhaustive `switch` over `SetgreetFlowEvent` without a `default` no longer compiles: add cases for the new events, or a `default` case.
+
+### Changed
+
+- Upgraded native iOS SDK dependency to 1.6.0
+- Upgraded native Android SDK dependency to 1.6.0
+
 ## [1.1.0] - 2026-06-19
 
 ### Added

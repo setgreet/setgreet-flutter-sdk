@@ -40,6 +40,7 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
     }
 
     defaultConfig {
@@ -48,5 +49,8 @@ android {
 }
 
 dependencies {
-    implementation 'com.setgreet:setgreet:1.3.0'
+    implementation 'com.setgreet:setgreet:1.6.0'
+
+    // JVM unit tests of the purchase bridge (src/test/kotlin).
+    testImplementation 'junit:junit:4.13.2'
 }

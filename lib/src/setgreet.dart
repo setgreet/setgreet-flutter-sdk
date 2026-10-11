@@ -6,6 +6,8 @@ import 'config.dart';
 import 'exceptions.dart';
 import 'flow_events.dart';
 import 'flow_callbacks.dart';
+import 'purchase_bridge.dart';
+import 'purchases.dart';
 import 'theme_extractor.dart';
 import 'theme_sync_api.dart';
 
@@ -242,6 +244,80 @@ class Setgreet {
       typography: typography,
     );
   }
+
+  // MARK: - Purchase Provider
+
+  /// Registers the app's purchase provider so paywall screens can load
+  /// products, transact and branch on the outcome.
+  ///
+  /// [provider] is your [SetgreetPurchaseProvider], written on top of the
+  /// purchase tool your app already uses (see the RevenueCat reference file
+  /// in the example app). Configure that tool yourself first; Setgreet never
+  /// configures it.
+  ///
+  /// [defaultSource] (the current offering unless you say otherwise) is
+  /// loaded in the background right away, so the product catalog syncs to
+  /// the dashboard before any paywall is shown. It is also the source a
+  /// paywall screen reads when it has no plan picker. It is the only source
+  /// whose catalog is synced.
+  ///
+  /// Call it after [initialize]: a registration made earlier could not sync
+  /// the catalog. Register from the root isolate. A later call replaces the
+  /// provider.
+  ///
+  /// Example:
+  /// ```dart
+  /// await Setgreet.setPurchaseProvider(SetgreetRevenueCatProvider());
+  /// await Setgreet.setPurchaseProvider(
+  ///   SetgreetRevenueCatProvider(),
+  ///   defaultSource: const SetgreetPurchaseSource.offering('onboarding'),
+  /// );
+  /// ```
+  ///
+  /// Throws [SetgreetInitializationException] before [initialize], and
+  /// [SetgreetException] when `provider.providerId` does not match
+  /// `^[a-z][a-z0-9_]{0,39}$` (the backend rejects a catalog sync from any
+  /// other id) or the native SDK rejects the registration.
+  static Future<void> setPurchaseProvider(
+    SetgreetPurchaseProvider provider, {
+    SetgreetPurchaseSource defaultSource =
+        const SetgreetPurchaseSource.currentOffering(),
+  }) async {
+    _ensureInitialized();
+
+    final providerId = provider.providerId;
+    if (!_providerIdPattern.hasMatch(providerId)) {
+      throw SetgreetException(
+        'Provider ID "$providerId" must match ^[a-z][a-z0-9_]{0,39}\$',
+        code: 'INVALID_ARGUMENT',
+      );
+    }
+
+    // The provider answers native calls from now on: the native side starts
+    // loading the default source through it before this call returns. It is
+    // committed (replacing a previous provider for good) only once the native
+    // side accepted it; after a rejection the previous one answers again.
+    final registration = SetgreetPurchaseBridge.begin(provider);
+    try {
+      await _channel.invokeMethod('setPurchaseProvider', {
+        'providerId': providerId,
+        'defaultSource': SetgreetPurchaseBridge.encodeSource(defaultSource),
+        'firstInIsolate': registration.firstInIsolate,
+      });
+    } on PlatformException catch (e) {
+      SetgreetPurchaseBridge.abandon(registration);
+      throw SetgreetException(
+        e.message ?? 'Failed to register the purchase provider',
+        code: e.code,
+      );
+    } catch (_) {
+      SetgreetPurchaseBridge.abandon(registration);
+      rethrow;
+    }
+    SetgreetPurchaseBridge.commit(registration);
+  }
+
+  static final RegExp _providerIdPattern = RegExp(r'^[a-z][a-z0-9_]{0,39}$');
 
   // MARK: - Flow Event Callbacks
 

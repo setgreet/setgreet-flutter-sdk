@@ -205,6 +205,7 @@ Listen to flow lifecycle events to track user interactions and flow completion.
 - `onActionTriggered`: Called when user interacts with buttons
 - `onPermissionRequested`: Called when a permission request completes
 - `onError`: Called when an error occurs during flow operations
+- `onPurchaseCompleted`, `onPurchaseCancelled`, `onPurchaseFailed`, `onPurchasePending`, `onRestoreCompleted`, `onRestoreFailed`: paywall outcomes (see [Purchases and paywalls](#purchases-and-paywalls))
 
 **Using Callbacks Builder:**
 
@@ -262,9 +263,19 @@ Setgreet.flowEvents.listen((event) {
       print('Permission: ${event.permissionType} -> ${event.result}');
     case FlowErrorEvent():
       print('Error: ${event.errorType}');
+    case PurchaseCompletedEvent():
+      print('Purchased: ${event.productRef}');
+    case PurchaseCancelledEvent() ||
+        PurchaseFailedEvent() ||
+        PurchasePendingEvent() ||
+        RestoreCompletedEvent() ||
+        RestoreFailedEvent():
+      print('Paywall outcome: $event');
   }
 });
 ```
+
+`SetgreetFlowEvent` is sealed: a `switch` over it must cover every event type, or end with a `default` case.
 
 **Dismiss Reasons:**
 
@@ -298,6 +309,87 @@ Setgreet.flowEvents.listen((event) {
 | `permanentlyDenied` | Permission was permanently denied |
 | `alreadyGranted` | Permission was already granted |
 | `notRequired` | Permission request was not required |
+
+## Purchases and paywalls
+
+Setgreet renders paywall screens natively and branches the flow on the outcome. Your app implements one Dart interface, `SetgreetPurchaseProvider`, on top of the purchase tool it already uses (RevenueCat, Adapty, StoreKit, Google Play Billing). Setgreet wraps no vendor SDK, stores no vendor key and keeps no entitlement state; the SDK owns the loading state, the plan picker, live prices in copy, the purchase lock, branching, analytics and syncing your product catalog to the dashboard.
+
+### Register a provider
+
+Configure your purchase tool yourself, then register the provider after `Setgreet.initialize`:
+
+```dart
+await Setgreet.initialize('your_app_key_here');
+
+// Your own RevenueCat setup (Setgreet never configures it).
+await Purchases.configure(PurchasesConfiguration('<your RevenueCat public SDK key>'));
+
+await Setgreet.setPurchaseProvider(SetgreetRevenueCatProvider());
+```
+
+`defaultSource` (the current offering unless you pass another) is loaded in the background right away, so the catalog reaches the dashboard before any paywall is shown. It is also the source a paywall screen without a plan picker reads, and the only source whose catalog is synced:
+
+```dart
+await Setgreet.setPurchaseProvider(
+  SetgreetRevenueCatProvider(),
+  defaultSource: const SetgreetPurchaseSource.offering('onboarding'),
+);
+```
+
+A registration made before `initialize` throws `SetgreetInitializationException`; a `providerId` that does not match `^[a-z][a-z0-9_]{0,39}$` throws `SetgreetException`. A later call replaces the provider. Register from the root isolate only: the native SDK calls the provider through the root isolate's platform channel.
+
+### The interface
+
+```dart
+abstract class SetgreetPurchaseProvider {
+  String get providerId; // "revenuecat", "adapty", ... (^[a-z][a-z0-9_]{0,39}$)
+  Future<List<SetgreetPurchaseProduct>> loadProducts(SetgreetPurchaseSource source);
+  Future<SetgreetPurchaseResult> purchase(String productRef, SetgreetPurchaseSource source);
+  Future<SetgreetRestoreResult> restorePurchases();
+  Future<SetgreetPurchaseAccessState?> accessState(); // null = cannot say
+  void trackPaywallImpression(SetgreetPaywallImpressionContext context) {} // optional
+  void setAttributes(Map<String, String> attributes) {} // optional
+  Future<void> identify(String userId) async {} // optional
+  Future<void> reset() async {} // optional
+}
+```
+
+Extend the class; the optional methods default to no-ops.
+
+- **Refs are per source.** A product ref (a RevenueCat package identifier such as `$rc_annual`) is unique only within its source, since every offering can have a `$rc_annual`. `purchase` receives the source the product was loaded from: buy the product you returned for that ref from that source.
+- **Errors.** `loadProducts` throws a `SetgreetPurchaseError` (`providerNotInitialized`, `productNotFound`, `networkError`, ...) when products cannot be loaded; any other error is reported as `unknown`. `purchase` and `restorePurchases` report every outcome as a status; a thrown `SetgreetPurchaseError` becomes `failed` with its code, any other error `failed` with `unknown`. `accessState` returns null when it cannot say, and a thrown error counts as null.
+- **`priceAmount`** is a `double` (the type purchases_flutter reports). The native SDKs keep prices as exact decimals: the plugin converts the value through its shortest decimal form, so `49.99` stays `49.99`.
+- **Identity.** `identify` and `reset` run when you call `Setgreet.identifyUser` / `Setgreet.resetUser`. Implement them only if Setgreet should drive your purchase tool's identity; the RevenueCat reference leaves them empty because your app already calls `Purchases.logIn` / `logOut`.
+- **Fire-and-forget methods.** `trackPaywallImpression` and `setAttributes` return `void`, so nothing awaits them: if you override them with an `async` body, catch your own errors inside it.
+
+### RevenueCat reference provider
+
+[`example/lib/setgreet_revenuecat_provider.dart`](example/lib/setgreet_revenuecat_provider.dart) is a complete provider backed by RevenueCat. Copy it into your app; it compiles against the `purchases_flutter` dependency your app already has (10.3.0 or later) and adds nothing to Setgreet's own dependencies. The example app shows where to paste your RevenueCat keys (`example/lib/config.dart`). On Google Play it drops the app name Google Play appends to product titles, so "Premium Annual (Your App)" reaches your paywall as "Premium Annual".
+
+### Platform notes
+
+- The native SDK calls your Dart provider on the root isolate. On a paywall screen it waits up to 10 s for `loadProducts` (and for `accessState` when the screen skips users who already have access) before the screen follows its "unavailable" policy. `purchase` and `restorePurchases` have no time limit, since a store sheet can stay open for minutes.
+- If your provider never answers `loadProducts` or `accessState`, the plugin stops waiting after 30 s. `identify` and `reset` have no time limit: the native SDK runs them one after another and writes the user's access attributes once they are done, so cutting a slow one short could attribute the previous user's access to the new one.
+- If the Flutter engine is torn down while a call is waiting, the call is answered as if no provider were registered (a purchase or restore ends as `failed` with `not_configured`), so a paywall button never stays locked.
+- Android: the paywall runs in Setgreet's own activity, while your provider lives in the engine of your `FlutterActivity`, and purchases_flutter launches Google Play Billing from that `FlutterActivity`. If that activity is destroyed underneath the paywall, loads and purchases fail as engine-detached.
+- With several Flutter engines, the native SDK keeps only the last registration.
+- During development, a hot restart drops the Dart side of any call in flight. Such a call is answered as if no provider were registered once the restarted app registers its provider again.
+
+### Purchase events
+
+```dart
+Setgreet.setFlowCallbacks(
+  SetgreetFlowCallbacks()
+    ..onPurchaseCompleted((event) => print('${event.productRef}: ${event.accessRefs}'))
+    ..onPurchaseCancelled((event) => print('Cancelled ${event.productRef}'))
+    ..onPurchaseFailed((event) => print('Failed: ${event.error.code.rawValue} ${event.error.providerCode}'))
+    ..onPurchasePending((event) => print('Pending ${event.productRef}'))
+    ..onRestoreCompleted((event) => print('Restore: ${event.status.rawValue}'))
+    ..onRestoreFailed((event) => print('Restore failed: ${event.error.code.rawValue}')),
+);
+```
+
+Each of these events carries `flowId`, `screenId`, `componentId` (the button), `provider` and `timestamp`. The four purchase events add `productRef`; `PurchaseCompletedEvent` and `RestoreCompletedEvent` add `accessRefs` (the access the user now holds); `RestoreCompletedEvent` adds `status` (`restored` or `nothingToRestore`); the two failure events add `error` (`code`, `providerCode`, `message`). The same events arrive on `Setgreet.flowEvents`.
 
 ## External Data in Flows
 
@@ -354,3 +446,30 @@ If you continue to have issues, please [open an issue](https://github.com/setgre
 - iOS/Android version
 - Error messages
 - Steps to reproduce
+
+## Development
+
+Dart tests and the analyzer, from the repository root and from `example/`:
+
+```bash
+flutter test && flutter analyze
+cd example && flutter test && flutter analyze
+```
+
+The Android side of the purchase bridge has JVM unit tests in `android/src/test`. Run them through the example app's Gradle build:
+
+```bash
+cd example/android && ./gradlew :setgreet:testDebugUnitTest
+```
+
+The iOS side has XCTest cases in `example/ios/RunnerTests`. Build the example once first (the build runs `pod install`), then run them on a simulator:
+
+```bash
+cd example
+flutter build ios --simulator --no-codesign
+cd ios
+xcodebuild test -workspace Runner.xcworkspace -scheme Runner -only-testing:RunnerTests \
+  -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+
+The example targets iOS 15.1 and builds the simulator app for arm64 only (`EXCLUDED_ARCHS` on the Runner target), so both commands work with Xcode 27 as they are. On an Intel Mac, remove that exclusion to run the example in a simulator.

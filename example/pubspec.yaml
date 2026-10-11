@@ -38,6 +38,7 @@ dependencies:
   # Local Setgreet SDK dependency
   setgreet:
     path: ../
+  purchases_flutter: ^10.15.2
 
 dev_dependencies:
   flutter_test:

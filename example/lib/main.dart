@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:setgreet/setgreet.dart';
 import 'config.dart';
+import 'setgreet_revenuecat_provider.dart';
 
 void main() {
   runApp(const SetgreetExampleApp());
@@ -70,6 +73,24 @@ class _HomePageState extends State<HomePage> {
         })
         ..onError((event) {
           _addLog('Error: ${event.errorType.name} - ${event.message}');
+        })
+        ..onPurchaseCompleted((event) {
+          _addLog('Purchase Completed: ${event.productRef} (access: ${event.accessRefs.join(', ')})');
+        })
+        ..onPurchaseCancelled((event) {
+          _addLog('Purchase Cancelled: ${event.productRef}');
+        })
+        ..onPurchaseFailed((event) {
+          _addLog('Purchase Failed: ${event.productRef} - ${event.error.code.rawValue}');
+        })
+        ..onPurchasePending((event) {
+          _addLog('Purchase Pending: ${event.productRef}');
+        })
+        ..onRestoreCompleted((event) {
+          _addLog('Restore Completed: ${event.status.rawValue}');
+        })
+        ..onRestoreFailed((event) {
+          _addLog('Restore Failed: ${event.error.code.rawValue}');
         }),
     );
   }
@@ -100,6 +121,8 @@ class _HomePageState extends State<HomePage> {
         config: SetgreetConfig(debugMode: exampleConfig.debugMode),
       );
 
+      await _registerPurchaseProvider();
+
       await Setgreet.identifyUser(
         exampleConfig.testUserId,
         attributes: exampleConfig.testUserAttributes,
@@ -111,6 +134,19 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       _showMessage('Failed to initialize: $e', Colors.red);
     }
+  }
+
+  /// Paywalls: configure RevenueCat with your own key (see `config.dart`),
+  /// then register the copy-paste reference provider. Setgreet never
+  /// configures RevenueCat itself.
+  Future<void> _registerPurchaseProvider() async {
+    final apiKey = exampleConfig.revenueCatApiKey(
+      defaultTargetPlatform == TargetPlatform.android,
+    );
+    if (apiKey != null && !await Purchases.isConfigured) {
+      await Purchases.configure(PurchasesConfiguration(apiKey));
+    }
+    await Setgreet.setPurchaseProvider(SetgreetRevenueCatProvider());
   }
 
   Future<void> _handleShowFlow() async {
