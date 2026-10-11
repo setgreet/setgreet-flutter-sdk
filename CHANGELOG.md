@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The minimum Flutter version in `pubspec.yaml` is now 3.27.0. Since 1.1.0, theme sync has used `Color.r`, `.g` and `.b` (Flutter 3.27) and `ColorScheme.surfaceContainerHighest` (Flutter 3.22), so the package did not compile on older Flutter versions even though pub accepted them.
+
 ## [1.7.0] - 2026-10-11
 
 This release carries the version of the native Android SDK it bundles (1.7.0). The native iOS SDK stays at 1.6.0.

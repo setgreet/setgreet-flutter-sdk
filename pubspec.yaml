@@ -6,8 +6,10 @@ repository: https://github.com/setgreet/setgreet-flutter-sdk
 issue_tracker: https://github.com/setgreet/setgreet-flutter-sdk/issues
 
 environment:
+  # The real Dart floor is 3.6 (Flutter 3.27 below); 3.0 here keeps the
+  # package's language version, so raising it is a language change.
   sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.0.0"
+  flutter: ">=3.27.0"
 
 dependencies:
   flutter:
