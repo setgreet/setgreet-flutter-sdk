@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Flow callbacks (`setFlowCallbacks`, including `onPurchaseCompleted`) stopped firing once the app listened to `Setgreet.flowEvents`, and cancelling that listener stopped every event until `initialize` ran again. The callbacks and every `flowEvents` listener now share one subscription to the native events.
+
 ## [1.6.0] - 2026-10-11
 
 This release carries the version of the native SDKs it bundles (1.6.0), which shipped the same new purchase events as a minor release.

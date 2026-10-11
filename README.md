@@ -277,6 +277,8 @@ Setgreet.flowEvents.listen((event) {
 
 `SetgreetFlowEvent` is sealed: a `switch` over it must cover every event type, or end with a `default` case.
 
+The callbacks and `Setgreet.flowEvents` work together: they share one subscription to the native events, so you can use both, listen to `flowEvents` more than once, and cancel a `flowEvents` listener without stopping the callbacks.
+
 **Dismiss Reasons:**
 
 | Reason | Description |
