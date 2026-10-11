@@ -1,4 +1,12 @@
-# Uncomment this line to define a global platform for your project
+# iOS 15.1, the floor the post_install below raises every pod to. Keep it in
+# step with the Runner target (IPHONEOS_DEPLOYMENT_TARGET in
+# Runner.xcodeproj) and Flutter/AppFrameworkInfo.plist (MinimumOSVersion):
+# Xcode 27 supports nothing below iOS 15.0.
+#
+# The Runner target also excludes x86_64 from simulator builds
+# (EXCLUDED_ARCHS[sdk=iphonesimulator*]): with two simulator architectures,
+# Flutter 3.38's build script runs `lipo -verify_arch arm64 x86_64`, which
+# Xcode 27's lipo rejects.
 platform :ios, '15.1'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.

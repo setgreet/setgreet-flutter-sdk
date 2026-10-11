@@ -456,7 +456,13 @@ flutter test && flutter analyze
 cd example && flutter test && flutter analyze
 ```
 
-The iOS side of the purchase bridge has XCTest cases in `example/ios/RunnerTests`. Build the example once first (the build runs `pod install`), then run them on a simulator:
+The Android side of the purchase bridge has JVM unit tests in `android/src/test`. Run them through the example app's Gradle build:
+
+```bash
+cd example/android && ./gradlew :setgreet:testDebugUnitTest
+```
+
+The iOS side has XCTest cases in `example/ios/RunnerTests`. Build the example once first (the build runs `pod install`), then run them on a simulator:
 
 ```bash
 cd example
@@ -466,16 +472,4 @@ xcodebuild test -workspace Runner.xcworkspace -scheme Runner -only-testing:Runne
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
-With Xcode 27, pass two overrides to both commands: Xcode 27 rejects the example's iOS deployment target, and its `lipo` rejects the two-architecture check Flutter runs for simulator builds.
-
-```bash
-cd example
-FLUTTER_XCODE_IPHONEOS_DEPLOYMENT_TARGET=15.1 FLUTTER_XCODE_ARCHS=arm64 \
-  flutter build ios --simulator --no-codesign
-cd ios
-xcodebuild test -workspace Runner.xcworkspace -scheme Runner -only-testing:RunnerTests \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
-  IPHONEOS_DEPLOYMENT_TARGET=15.1 ARCHS=arm64
-```
-
-The build updates a few tracked files under `example/ios` (Flutter's project migrations and the CocoaPods integration); restore them with `git checkout` if you do not mean to commit them.
+The example targets iOS 15.1 and builds the simulator app for arm64 only (`EXCLUDED_ARCHS` on the Runner target), so both commands work with Xcode 27 as they are. On an Intel Mac, remove that exclusion to run the example in a simulator.
