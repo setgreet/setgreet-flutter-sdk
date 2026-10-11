@@ -23,6 +23,21 @@ class Setgreet {
   static SetgreetFlowCallbacks? _callbacks;
   static StreamSubscription? _eventSubscription;
 
+  /// The flow events from the native SDK. Flutter keeps one Dart message
+  /// handler per channel, and every `receiveBroadcastStream()` call replaces
+  /// it, so this one stream is shared by the callbacks' listener and every
+  /// [flowEvents] listener. Its platform subscription starts with the first
+  /// listener and ends with the last.
+  static final Stream<dynamic> _platformEvents =
+      _eventChannel.receiveBroadcastStream();
+
+  /// [flowEvents]: the platform events, parsed for each listener.
+  static final Stream<SetgreetFlowEvent> _flowEvents =
+      _platformEvents.map((event) {
+    final map = Map<dynamic, dynamic>.from(event as Map);
+    return SetgreetFlowEvent.fromMap(map);
+  });
+
   static String? _appKey;
   static String _apiUrl = _defaultApiUrl;
 
@@ -61,12 +76,12 @@ class Setgreet {
     }
   }
 
-  /// Start listening for flow events from native
+  /// Start listening for flow events from native, once: the subscription
+  /// drives the callbacks and keeps the platform subscription open, so
+  /// [flowEvents] listeners can come and go.
   static void _startEventListener() {
-    _eventSubscription?.cancel();
-    _eventSubscription = _eventChannel
-        .receiveBroadcastStream()
-        .listen(_handleEvent, onError: _handleEventError);
+    _eventSubscription ??=
+        _platformEvents.listen(_handleEvent, onError: _handleEventError);
   }
 
   /// Handle incoming flow events
@@ -349,7 +364,9 @@ class Setgreet {
 
   /// Get a stream of all flow events.
   ///
-  /// Use this for reactive programming patterns.
+  /// Use this for reactive programming patterns. It works alongside
+  /// [setFlowCallbacks]: both share one subscription to the native events,
+  /// and cancelling a listener here never stops the callbacks.
   ///
   /// Example:
   /// ```dart
@@ -363,12 +380,7 @@ class Setgreet {
   ///   }
   /// });
   /// ```
-  static Stream<SetgreetFlowEvent> get flowEvents {
-    return _eventChannel.receiveBroadcastStream().map((event) {
-      final map = Map<dynamic, dynamic>.from(event as Map);
-      return SetgreetFlowEvent.fromMap(map);
-    });
-  }
+  static Stream<SetgreetFlowEvent> get flowEvents => _flowEvents;
 
   /// Clears all registered flow callbacks.
   static void clearFlowCallbacks() {
