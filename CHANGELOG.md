@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-11
+
+This release carries the version of the native Android SDK it bundles (1.7.0). The native iOS SDK stays at 1.6.0.
+
+### Changed
+
+- Upgraded native Android SDK dependency to 1.7.0. The Android SDK no longer sets a network security config for your whole app, so your app's own network policy applies again. If your app relied on the SDK's config, for example to trust user-installed CA certificates, or references `@xml/network_security_config` without defining it, add a network security config of your own.
+
 ### Fixed
 
 - Flow callbacks (`setFlowCallbacks`, including `onPurchaseCompleted`) stopped firing once the app listened to `Setgreet.flowEvents`, and cancelling that listener stopped every event until `initialize` ran again. The callbacks and every `flowEvents` listener now share one subscription to the native events.
