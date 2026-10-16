@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `onCustomAction` and `onTrackEvent` callbacks, with matching `CustomActionEvent` and `TrackEventEvent` on `Setgreet.flowEvents`. They fire when the user taps a button or card whose action is Custom Action (with its custom data) or Track Event (with the event name and properties, to forward to your own analytics).
+  - On Android, the plugin receives these events through the native SDK's single `Setgreet.setFlowListener` slot. `Setgreet.initialize` replaces a listener set from Android code before it, and a `Setgreet.setFlowListener` call from Android code after it stops these events in Dart.
+
+### Breaking Changes
+
+- `SetgreetFlowEvent` has three new subclasses (`CustomActionEvent`, `TrackEventEvent`, `RemindLaterEvent`). An exhaustive `switch` over `SetgreetFlowEvent` without a `default` no longer compiles: add cases for the new events, or a `default` case. The version number follows the version of the bundled native SDKs (see 1.6.0), so this breaking change ships in a minor release.
+
 ### Fixed
 
 - The minimum Flutter version in `pubspec.yaml` is now 3.27.0. Since 1.1.0, theme sync has used `Color.r`, `.g` and `.b` (Flutter 3.27) and `ColorScheme.surfaceContainerHighest` (Flutter 3.22), so the package did not compile on older Flutter versions even though pub accepted them.

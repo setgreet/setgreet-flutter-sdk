@@ -449,3 +449,129 @@ final class PurchaseBridgeTests: XCTestCase {
     XCTAssertEqual(failed?["message"] as? String, "offline")
   }
 }
+
+// MARK: - Action, error, custom action, track event and remind later maps
+
+final class FlowEventMapsTests: XCTestCase {
+
+  private let plugin = SetgreetPlugin(
+    purchaseChannel: FlutterMethodChannel(name: "setgreet/purchases", binaryMessenger: FakeBinaryMessenger())
+  )
+
+  private let canonicalActionTypes = [
+    "next", "previous", "skip", "dismiss", "remind_later", "url", "deeplink",
+    "request_notification_permission", "request_location_permission",
+    "request_camera_permission", "request_tracking_permission",
+    "request_microphone_permission", "request_photo_library_permission",
+    "request_review", "share", "open_settings", "track_event", "custom",
+    "purchase", "restore_purchases",
+  ]
+
+  func testCanonicalActionTypesPassThrough() {
+    for actionType in canonicalActionTypes {
+      XCTAssertEqual(SetgreetPlugin.canonicalActionType(actionType), actionType)
+    }
+  }
+
+  func testOtherSpellingsBecomeCanonical() {
+    XCTAssertEqual(SetgreetPlugin.canonicalActionType("REMIND_LATER"), "remind_later")
+    XCTAssertEqual(SetgreetPlugin.canonicalActionType("remindLater"), "remind_later")
+    XCTAssertEqual(SetgreetPlugin.canonicalActionType("requestPhotoLibraryPermission"), "request_photo_library_permission")
+    XCTAssertEqual(SetgreetPlugin.canonicalActionType("RESTORE_PURCHASES"), "restore_purchases")
+    XCTAssertEqual(SetgreetPlugin.canonicalActionType("URL"), "url")
+  }
+
+  func testActionTriggeredCarriesTheKeysTheDartParserReads() {
+    let map = plugin.createActionTriggeredEvent(ActionTriggeredEvent(
+      flowId: "flow-1", actionType: "track_event", actionName: "plan_viewed", screenIndex: 2, timestamp: 1_760_000_000
+    ))
+    XCTAssertEqual(Set(map.keys), ["type", "flowId", "actionType", "actionName", "screenIndex", "timestamp"])
+    XCTAssertEqual(map["type"] as? String, "actionTriggered")
+    XCTAssertEqual(map["actionType"] as? String, "track_event")
+    XCTAssertEqual(map["actionName"] as? String, "plan_viewed")
+    XCTAssertEqual(map["screenIndex"] as? Int, 2)
+    XCTAssertEqual(map["timestamp"] as? Double, 1_760_000_000_000, "milliseconds, as on Android")
+
+    let unnamed = plugin.createActionTriggeredEvent(ActionTriggeredEvent(
+      flowId: "flow-1", actionType: "next", actionName: nil, screenIndex: 0
+    ))
+    XCTAssertTrue(unnamed["actionName"] is NSNull)
+  }
+
+  func testEveryErrorTypeMapsToTheDartWireValue() {
+    let expected: [(FlowErrorType, String)] = [
+      (.network, "network"), (.parse, "parse"), (.display, "display"), (.unknown, "unknown"),
+    ]
+    for (errorType, wire) in expected {
+      let map = plugin.createFlowErrorEvent(FlowErrorEvent(flowId: "flow-1", errorType: errorType, message: "boom"))
+      XCTAssertEqual(Set(map.keys), ["type", "flowId", "errorType", "message", "timestamp"])
+      XCTAssertEqual(map["type"] as? String, "flowError")
+      XCTAssertEqual(map["errorType"] as? String, wire)
+      XCTAssertEqual(map["message"] as? String, "boom")
+    }
+  }
+
+  func testCustomActionTrackEventAndRemindLaterMaps() {
+    let custom = plugin.createCustomActionEvent(CustomActionEvent(
+      flowId: "flow-1", data: ["screen": "paywall", "count": 3], screenIndex: 1, timestamp: 1_760_000_000
+    ))
+    XCTAssertEqual(Set(custom.keys), ["type", "flowId", "data", "screenIndex", "timestamp"])
+    XCTAssertEqual(custom["type"] as? String, "customAction")
+    let data = custom["data"] as? [String: Any]
+    XCTAssertEqual(data?["screen"] as? String, "paywall")
+    XCTAssertEqual(data?["count"] as? Int, 3)
+    XCTAssertEqual(custom["screenIndex"] as? Int, 1)
+    XCTAssertEqual(custom["timestamp"] as? Double, 1_760_000_000_000)
+
+    let track = plugin.createTrackEventEvent(TrackEventEvent(
+      flowId: "flow-1", eventName: "plan_viewed", properties: ["plan": "annual"], screenIndex: 1
+    ))
+    XCTAssertEqual(Set(track.keys), ["type", "flowId", "eventName", "properties", "screenIndex", "timestamp"])
+    XCTAssertEqual(track["type"] as? String, "trackEvent")
+    XCTAssertEqual(track["eventName"] as? String, "plan_viewed")
+    XCTAssertEqual((track["properties"] as? [String: Any])?["plan"] as? String, "annual")
+
+    let remind = plugin.createRemindLaterEvent(RemindLaterEvent(flowId: "flow-1", screenIndex: 3))
+    XCTAssertEqual(Set(remind.keys), ["type", "flowId", "screenIndex", "timestamp"])
+    XCTAssertEqual(remind["type"] as? String, "remindLater")
+    XCTAssertEqual(remind["screenIndex"] as? Int, 3)
+  }
+
+  func testAbsentDataAndPropertiesAreNull() {
+    let custom = plugin.createCustomActionEvent(CustomActionEvent(flowId: "flow-1", data: nil, screenIndex: 0))
+    XCTAssertTrue(custom["data"] is NSNull)
+    let track = plugin.createTrackEventEvent(TrackEventEvent(
+      flowId: "flow-1", eventName: "e", properties: nil, screenIndex: 0
+    ))
+    XCTAssertTrue(track["properties"] is NSNull)
+  }
+
+  func testEveryEventMapEncodesWithTheStandardCodec() {
+    struct Opaque: CustomStringConvertible {
+      var description: String { "opaque" }
+    }
+    let optionalNil: String? = nil
+    let custom = plugin.createCustomActionEvent(CustomActionEvent(
+      flowId: "flow-1",
+      data: [
+        "date": Date(timeIntervalSince1970: 0),
+        "opaque": Opaque(),
+        "nested": ["list": [Opaque(), 1, true]],
+        "optional": optionalNil as Any,
+      ],
+      screenIndex: 0
+    ))
+
+    // An unsupported value would raise here, as it would in the event sink.
+    let encoded = FlutterStandardMessageCodec.sharedInstance().encode(custom)
+    let decoded = FlutterStandardMessageCodec.sharedInstance().decode(encoded) as? [String: Any]
+    let data = decoded?["data"] as? [String: Any]
+    XCTAssertEqual(data?["opaque"] as? String, "opaque")
+    XCTAssertNotNil(data?["date"] as? String)
+    XCTAssertTrue(data?["optional"] is NSNull)
+    let list = (data?["nested"] as? [String: Any])?["list"] as? [Any]
+    XCTAssertEqual(list?.first as? String, "opaque")
+    XCTAssertEqual(list?[1] as? Int, 1)
+    XCTAssertEqual(list?[2] as? Bool, true)
+  }
+}
