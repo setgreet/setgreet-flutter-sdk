@@ -11,6 +11,7 @@ import com.setgreet.Setgreet
 import com.setgreet.listener.DismissReason
 import com.setgreet.listener.ErrorType
 import com.setgreet.listener.SetgreetFlowEvent
+import com.setgreet.listener.SetgreetFlowListener
 import com.setgreet.model.SetgreetConfig
 import com.setgreet.purchases.SetgreetPurchaseError
 import com.setgreet.purchases.SetgreetPurchaseSource
@@ -89,6 +90,29 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
         sendEvent(createRestoreFailedEvent(event))
       }
     }
+    // Custom action, track event and remind later reach only the listener:
+    // the callbacks builder has no slot for them. The listener receives every
+    // event, so it forwards just these three; the callbacks send the rest.
+    // This takes the native SDK's single listener slot: it replaces a host
+    // listener set before `initialize`, and a host `setFlowListener` call
+    // after it stops these three events in Dart (documented in the README).
+    // TODO: once the Android pin moves to 1.8.0, which adds the builder
+    // callbacks onCustomAction, onTrackEvent and onRemindLater, switch to
+    // those and drop setFlowListener. Never register both, or these events
+    // arrive in Dart twice.
+    Setgreet.setFlowListener(object : SetgreetFlowListener {
+      override fun onFlowEvent(event: SetgreetFlowEvent) {
+        listenerOnlyEventMap(event)?.let(::sendEvent)
+      }
+    })
+  }
+
+  /** The map for an event only `setFlowListener` delivers, or null for an event the callbacks already send. */
+  internal fun listenerOnlyEventMap(event: SetgreetFlowEvent): Map<String, Any?>? = when (event) {
+    is SetgreetFlowEvent.CustomAction -> createCustomActionEvent(event)
+    is SetgreetFlowEvent.TrackEvent -> createTrackEventEvent(event)
+    is SetgreetFlowEvent.RemindLater -> createRemindLaterEvent(event)
+    else -> null
   }
 
   private fun sendEvent(data: Map<String, Any?>) {
@@ -139,10 +163,13 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createActionTriggeredEvent(event: SetgreetFlowEvent.ActionTriggered): Map<String, Any?> {
+  // Internal, not private, for the JVM unit tests (src/test).
+  internal fun createActionTriggeredEvent(event: SetgreetFlowEvent.ActionTriggered): Map<String, Any?> {
     return mapOf(
       "type" to "actionTriggered",
       "flowId" to event.flowId,
+      // REMIND_LATER -> "remind_later": the canonical snake_case action type.
+      // `lowercase()` is locale-invariant, so no Turkish dotless i.
       "actionType" to event.actionType.name.lowercase(),
       "actionName" to event.actionName,
       "screenIndex" to event.screenIndex,
@@ -150,12 +177,42 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     )
   }
 
-  private fun createFlowErrorEvent(event: SetgreetFlowEvent.FlowError): Map<String, Any?> {
+  internal fun createFlowErrorEvent(event: SetgreetFlowEvent.FlowError): Map<String, Any?> {
     return mapOf(
       "type" to "flowError",
       "flowId" to event.flowId,
       "errorType" to event.errorType.toFlutterString(),
       "message" to event.message,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createCustomActionEvent(event: SetgreetFlowEvent.CustomAction): Map<String, Any?> {
+    return mapOf(
+      "type" to "customAction",
+      "flowId" to event.flowId,
+      "data" to codecSafe(event.data),
+      "screenIndex" to event.screenIndex,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createTrackEventEvent(event: SetgreetFlowEvent.TrackEvent): Map<String, Any?> {
+    return mapOf(
+      "type" to "trackEvent",
+      "flowId" to event.flowId,
+      "eventName" to event.eventName,
+      "properties" to codecSafe(event.properties),
+      "screenIndex" to event.screenIndex,
+      "timestamp" to event.timestamp.toDouble()
+    )
+  }
+
+  internal fun createRemindLaterEvent(event: SetgreetFlowEvent.RemindLater): Map<String, Any?> {
+    return mapOf(
+      "type" to "remindLater",
+      "flowId" to event.flowId,
+      "screenIndex" to event.screenIndex,
       "timestamp" to event.timestamp.toDouble()
     )
   }
@@ -246,6 +303,21 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
       "error" to event.error.toFlutterMap(),
       "timestamp" to event.timestamp.toDouble()
     )
+  }
+
+  /**
+   * [value] with only what the standard message codec encodes: an
+   * unsupported value would throw on the main thread when the event is sent.
+   * Anything else becomes its string form.
+   */
+  internal fun codecSafe(value: Any?): Any? = when (value) {
+    null, is String, is Boolean, is Int, is Long, is Double -> value
+    is Byte, is Short -> value.toInt()
+    is Number -> value.toDouble()
+    is Map<*, *> -> value.entries.associate { (key, item) -> key.toString() to codecSafe(item) }
+    is Iterable<*> -> value.map(::codecSafe)
+    is Array<*> -> value.map(::codecSafe)
+    else -> value.toString()
   }
 
   private fun SetgreetPurchaseError.toFlutterMap(): Map<String, Any?> = mapOf(

@@ -351,10 +351,8 @@ class Setgreet {
   ///     ..onFlowCompleted((event) {
   ///       analytics.log('flow_completed', {'duration': event.durationMs});
   ///     })
-  ///     ..onActionTriggered((event) {
-  ///       if (event.actionName != null) {
-  ///         trackCustomEvent(event.actionName!);
-  ///       }
+  ///     ..onTrackEvent((event) {
+  ///       analytics.log(event.eventName, event.properties);
   ///     }),
   /// );
   /// ```

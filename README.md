@@ -202,9 +202,11 @@ Listen to flow lifecycle events to track user interactions and flow completion.
 - `onFlowCompleted`: Called when user completes all screens in the flow
 - `onFlowDismissed`: Called when user dismisses the flow before completion
 - `onScreenChanged`: Called when user navigates between screens
-- `onActionTriggered`: Called when user interacts with buttons
+- `onActionTriggered`: Called when a button's action is triggered, just before it runs, with the action's type (see [Action types](#action-types)). It also fires when required inputs on the screen then stop the action
+- `onCustomAction`: Called when the user taps a button or card whose action is Custom Action, with the custom data configured on it
+- `onTrackEvent`: Called when the user taps a button or card whose action is Track Event, with the event name and properties, so you can forward them to your own analytics
 - `onPermissionRequested`: Called when a permission request completes
-- `onError`: Called when an error occurs during flow operations
+- `onError`: Called when an error occurs during flow operations, with an error type (`network`, `parse`, `display` or `unknown`) and a message
 - `onPurchaseCompleted`, `onPurchaseCancelled`, `onPurchaseFailed`, `onPurchasePending`, `onRestoreCompleted`, `onRestoreFailed`: paywall outcomes (see [Purchases and paywalls](#purchases-and-paywalls))
 
 **Using Callbacks Builder:**
@@ -229,10 +231,14 @@ Setgreet.setFlowCallbacks(
       print('Screen changed: ${event.fromIndex + 1} -> ${event.toIndex + 1}');
     })
     ..onActionTriggered((event) {
-      print('Action: ${event.actionType}');
-      if (event.actionName != null) {
-        print('Custom event name: ${event.actionName}');
-      }
+      print('Action: ${event.actionType} on screen ${event.screenIndex + 1}');
+    })
+    ..onCustomAction((event) {
+      print('Custom action: ${event.data}');
+    })
+    ..onTrackEvent((event) {
+      // Forward to your own analytics
+      print('Track event: ${event.eventName} ${event.properties}');
     })
     ..onPermissionRequested((event) {
       print('Permission: ${event.permissionType} -> ${event.result}');
@@ -259,6 +265,10 @@ Setgreet.flowEvents.listen((event) {
       print('Screen changed: ${event.fromIndex} -> ${event.toIndex}');
     case ActionTriggeredEvent():
       print('Action: ${event.actionType}');
+    case CustomActionEvent():
+      print('Custom action: ${event.data}');
+    case TrackEventEvent():
+      print('Track event: ${event.eventName}');
     case PermissionRequestedEvent():
       print('Permission: ${event.permissionType} -> ${event.result}');
     case FlowErrorEvent():
@@ -311,6 +321,37 @@ The callbacks and `Setgreet.flowEvents` work together: they share one subscripti
 | `permanentlyDenied` | Permission was permanently denied |
 | `alreadyGranted` | Permission was already granted |
 | `notRequired` | Permission request was not required |
+
+#### Action types
+
+`ActionTriggeredEvent.actionType` is one of these snake_case strings, the same on iOS and Android:
+
+| Action type | Action |
+|-------------|--------|
+| `next`, `previous` | Go to the next or previous screen |
+| `skip` | Skip the flow |
+| `dismiss` | Close the flow |
+| `url` | Open a URL |
+| `request_notification_permission`, `request_location_permission`, `request_camera_permission`, `request_tracking_permission`, `request_microphone_permission`, `request_photo_library_permission` | Request a permission (the result fires `onPermissionRequested`) |
+| `request_review` | Ask for an App Store or Google Play review |
+| `share` | Open the share sheet |
+| `open_settings` | Open the app's system settings |
+| `track_event` | Track an event (also fires `onTrackEvent`); `actionName` is the event name |
+| `custom` | Custom action (also fires `onCustomAction`) |
+| `purchase`, `restore_purchases` | Buy a product or restore purchases (the outcome fires the purchase events) |
+
+`actionName` is the Track Event's event name for `track_event` and null for every other action.
+
+#### Custom action and track event events
+
+| Event | Fields |
+|-------|--------|
+| `CustomActionEvent` | `flowId`, `data` (`Map<String, Object?>?`, the custom data configured in the dashboard), `screenIndex`, `timestamp` |
+| `TrackEventEvent` | `flowId`, `eventName`, `properties` (`Map<String, Object?>?`), `screenIndex`, `timestamp` |
+
+On iOS, `data` and `properties` keep their JSON types (numbers, booleans, nested maps and lists). On Android, every value arrives as a string, and a nested object or array as `null`, so read values defensively, for example `int.tryParse('${event.data?['count']}')`.
+
+On Android, the plugin receives `onCustomAction` and `onTrackEvent` through the native SDK's `Setgreet.setFlowListener`, which holds a single listener. `Setgreet.initialize` replaces a listener your Android code set earlier, and a `Setgreet.setFlowListener` call from your Android code after `initialize` stops these two events in Dart. Use the Dart callbacks or `Setgreet.flowEvents` instead of a native listener.
 
 ## Purchases and paywalls
 

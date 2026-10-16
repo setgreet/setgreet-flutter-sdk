@@ -9,6 +9,9 @@ typedef ActionTriggeredCallback = void Function(ActionTriggeredEvent event);
 typedef PermissionRequestedCallback = void Function(
     PermissionRequestedEvent event);
 typedef FlowErrorCallback = void Function(FlowErrorEvent event);
+typedef CustomActionCallback = void Function(CustomActionEvent event);
+typedef TrackEventCallback = void Function(TrackEventEvent event);
+typedef RemindLaterCallback = void Function(RemindLaterEvent event);
 typedef PurchaseCompletedCallback = void Function(PurchaseCompletedEvent event);
 typedef PurchaseCancelledCallback = void Function(PurchaseCancelledEvent event);
 typedef PurchaseFailedCallback = void Function(PurchaseFailedEvent event);
@@ -33,10 +36,11 @@ typedef RestoreFailedCallback = void Function(RestoreFailedEvent event);
 ///         promptForFeedback();
 ///       }
 ///     })
-///     ..onActionTriggered((event) {
-///       if (event.actionName != null) {
-///         trackCustomEvent(event.actionName!);
-///       }
+///     ..onTrackEvent((event) {
+///       analytics.log(event.eventName, event.properties);
+///     })
+///     ..onCustomAction((event) {
+///       handleCustomAction(event.data);
 ///     }),
 /// );
 /// ```
@@ -48,6 +52,9 @@ class SetgreetFlowCallbacks {
   ActionTriggeredCallback? _onActionTriggered;
   PermissionRequestedCallback? _onPermissionRequested;
   FlowErrorCallback? _onError;
+  CustomActionCallback? _onCustomAction;
+  TrackEventCallback? _onTrackEvent;
+  RemindLaterCallback? _onRemindLater;
   PurchaseCompletedCallback? _onPurchaseCompleted;
   PurchaseCancelledCallback? _onPurchaseCancelled;
   PurchaseFailedCallback? _onPurchaseFailed;
@@ -79,7 +86,8 @@ class SetgreetFlowCallbacks {
     return this;
   }
 
-  /// Register a callback for when a button action is triggered.
+  /// Register a callback for when the user taps a button or card that runs
+  /// an action. [ActionTriggeredEvent.actionType] says which action.
   SetgreetFlowCallbacks onActionTriggered(ActionTriggeredCallback callback) {
     _onActionTriggered = callback;
     return this;
@@ -95,6 +103,28 @@ class SetgreetFlowCallbacks {
   /// Register a callback for when an error occurs.
   SetgreetFlowCallbacks onError(FlowErrorCallback callback) {
     _onError = callback;
+    return this;
+  }
+
+  /// Register a callback for when the user taps a button or card whose
+  /// action is Custom Action; [CustomActionEvent.data] carries the data
+  /// configured on it.
+  SetgreetFlowCallbacks onCustomAction(CustomActionCallback callback) {
+    _onCustomAction = callback;
+    return this;
+  }
+
+  /// Register a callback for when the user taps a button or card whose
+  /// action is Track Event, to forward the event to your own analytics.
+  SetgreetFlowCallbacks onTrackEvent(TrackEventCallback callback) {
+    _onTrackEvent = callback;
+    return this;
+  }
+
+  /// Register a callback for when the user taps a button or card whose
+  /// action is Remind Later. The flow then closes.
+  SetgreetFlowCallbacks onRemindLater(RemindLaterCallback callback) {
+    _onRemindLater = callback;
     return this;
   }
 
@@ -155,6 +185,12 @@ class SetgreetFlowCallbacks {
         _onPermissionRequested?.call(event);
       case FlowErrorEvent():
         _onError?.call(event);
+      case CustomActionEvent():
+        _onCustomAction?.call(event);
+      case TrackEventEvent():
+        _onTrackEvent?.call(event);
+      case RemindLaterEvent():
+        _onRemindLater?.call(event);
       case PurchaseCompletedEvent():
         _onPurchaseCompleted?.call(event);
       case PurchaseCancelledEvent():

@@ -214,6 +214,27 @@ sealed class SetgreetFlowEvent {
           message: map['message'] as String,
           timestamp: timestamp,
         );
+      case 'customAction':
+        return CustomActionEvent(
+          flowId: flowId,
+          data: _stringKeyedMap(map['data']),
+          screenIndex: map['screenIndex'] as int,
+          timestamp: timestamp,
+        );
+      case 'trackEvent':
+        return TrackEventEvent(
+          flowId: flowId,
+          eventName: map['eventName'] as String,
+          properties: _stringKeyedMap(map['properties']),
+          screenIndex: map['screenIndex'] as int,
+          timestamp: timestamp,
+        );
+      case 'remindLater':
+        return RemindLaterEvent(
+          flowId: flowId,
+          screenIndex: map['screenIndex'] as int,
+          timestamp: timestamp,
+        );
       case 'permissionRequested':
         return PermissionRequestedEvent(
           flowId: flowId,
@@ -284,6 +305,24 @@ sealed class SetgreetFlowEvent {
         throw ArgumentError('Unknown event type: $type');
     }
   }
+}
+
+/// A map from the platform channel, whose keys arrive as `Object?`, with
+/// string keys at every level. Null when the native SDK sent none.
+Map<String, Object?>? _stringKeyedMap(Object? value) =>
+    value is Map ? _deepStringKeys(value) as Map<String, Object?> : null;
+
+Object? _deepStringKeys(Object? value) {
+  if (value is Map) {
+    return <String, Object?>{
+      for (final entry in value.entries)
+        entry.key.toString(): _deepStringKeys(entry.value),
+    };
+  }
+  if (value is List) {
+    return value.map(_deepStringKeys).toList();
+  }
+  return value;
 }
 
 List<String> _stringList(Object? value) =>
@@ -400,12 +439,19 @@ class ScreenChangedEvent extends SetgreetFlowEvent {
       'ScreenChangedEvent(flowId: $flowId, from: $fromIndex, to: $toIndex)';
 }
 
-/// Emitted when a button action is triggered by the user.
+/// Emitted when the user taps a button or card that runs an action.
 class ActionTriggeredEvent extends SetgreetFlowEvent {
-  /// The type of action performed (close, next, skip, etc.)
+  /// The action that ran, in snake_case: `next`, `previous`, `skip`,
+  /// `dismiss`, `url`,
+  /// `request_notification_permission`, `request_location_permission`,
+  /// `request_camera_permission`, `request_tracking_permission`,
+  /// `request_microphone_permission`, `request_photo_library_permission`,
+  /// `request_review`, `share`, `open_settings`, `track_event`, `custom`,
+  /// `purchase` or `restore_purchases`.
   final String actionType;
 
-  /// Custom event name if configured in dashboard, null otherwise
+  /// The Track Event's event name when [actionType] is `track_event`, null
+  /// otherwise.
   final String? actionName;
 
   /// The screen index where the action occurred (0-based)
@@ -442,6 +488,72 @@ class FlowErrorEvent extends SetgreetFlowEvent {
   @override
   String toString() =>
       'FlowErrorEvent(flowId: $flowId, errorType: $errorType, message: $message)';
+}
+
+/// Emitted when the user taps a button or card whose action is Custom
+/// Action. Use it to run your own code from a flow.
+class CustomActionEvent extends SetgreetFlowEvent {
+  /// The custom data configured on the action in the dashboard, null when
+  /// none was configured
+  final Map<String, Object?>? data;
+
+  /// The screen index where the action occurred (0-based)
+  final int screenIndex;
+
+  const CustomActionEvent({
+    required super.flowId,
+    this.data,
+    required this.screenIndex,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'CustomActionEvent(flowId: $flowId, data: $data, screenIndex: $screenIndex)';
+}
+
+/// Emitted when the user taps a button or card whose action is Track Event.
+/// Use it to forward the event to your own analytics.
+class TrackEventEvent extends SetgreetFlowEvent {
+  /// The event name configured on the action in the dashboard
+  final String eventName;
+
+  /// The event properties configured on the action, null when none were
+  /// configured
+  final Map<String, Object?>? properties;
+
+  /// The screen index where the action occurred (0-based)
+  final int screenIndex;
+
+  const TrackEventEvent({
+    required super.flowId,
+    required this.eventName,
+    this.properties,
+    required this.screenIndex,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'TrackEventEvent(flowId: $flowId, eventName: $eventName, properties: $properties)';
+}
+
+/// Emitted when the user taps a button or card whose action is Remind
+/// Later. The flow then closes, with a [FlowDismissedEvent] whose reason is
+/// [DismissReason.remindLater].
+class RemindLaterEvent extends SetgreetFlowEvent {
+  /// The screen index where the action occurred (0-based)
+  final int screenIndex;
+
+  const RemindLaterEvent({
+    required super.flowId,
+    required this.screenIndex,
+    required super.timestamp,
+  });
+
+  @override
+  String toString() =>
+      'RemindLaterEvent(flowId: $flowId, screenIndex: $screenIndex)';
 }
 
 /// Emitted when a permission request completes within a flow.

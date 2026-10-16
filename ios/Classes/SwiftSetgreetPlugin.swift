@@ -71,6 +71,15 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
         .onError { event in
           self?.sendEvent(self?.createFlowErrorEvent(event))
         }
+        .onCustomAction { event in
+          self?.sendEvent(self?.createCustomActionEvent(event))
+        }
+        .onTrackEvent { event in
+          self?.sendEvent(self?.createTrackEventEvent(event))
+        }
+        .onRemindLater { event in
+          self?.sendEvent(self?.createRemindLaterEvent(event))
+        }
         .onPurchaseCompleted { event in
           self?.sendEvent(self?.createPurchaseCompletedEvent(event))
         }
@@ -141,11 +150,14 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     ]
   }
 
-  private func createActionTriggeredEvent(_ event: ActionTriggeredEvent) -> [String: Any] {
+  // MARK: - Action, error, custom action, track event and remind later
+  // (internal, not private: the example's RunnerTests cover them)
+
+  func createActionTriggeredEvent(_ event: ActionTriggeredEvent) -> [String: Any] {
     var dict: [String: Any] = [
       "type": "actionTriggered",
       "flowId": event.flowId,
-      "actionType": event.actionType.lowercased(),
+      "actionType": SetgreetPlugin.canonicalActionType(event.actionType),
       "screenIndex": event.screenIndex,
       "timestamp": event.timestamp * 1000
     ]
@@ -157,7 +169,7 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     return dict
   }
 
-  private func createFlowErrorEvent(_ event: FlowErrorEvent) -> [String: Any] {
+  func createFlowErrorEvent(_ event: FlowErrorEvent) -> [String: Any] {
     return [
       "type": "flowError",
       "flowId": event.flowId,
@@ -165,6 +177,81 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       "message": event.message,
       "timestamp": event.timestamp * 1000
     ]
+  }
+
+  func createCustomActionEvent(_ event: CustomActionEvent) -> [String: Any] {
+    return [
+      "type": "customAction",
+      "flowId": event.flowId,
+      "data": SetgreetPlugin.codecSafe(event.data),
+      "screenIndex": event.screenIndex,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func createTrackEventEvent(_ event: TrackEventEvent) -> [String: Any] {
+    return [
+      "type": "trackEvent",
+      "flowId": event.flowId,
+      "eventName": event.eventName,
+      "properties": SetgreetPlugin.codecSafe(event.properties),
+      "screenIndex": event.screenIndex,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  func createRemindLaterEvent(_ event: RemindLaterEvent) -> [String: Any] {
+    return [
+      "type": "remindLater",
+      "flowId": event.flowId,
+      "screenIndex": event.screenIndex,
+      "timestamp": event.timestamp * 1000
+    ]
+  }
+
+  /// The canonical snake_case action type ("remind_later") from any spelling
+  /// the native SDK uses: "remind_later", "REMIND_LATER" or "remindLater".
+  static func canonicalActionType(_ raw: String) -> String {
+    var result = ""
+    var previous: Character?
+    for character in raw {
+      if character.isUppercase, let previous = previous, previous.isLowercase || previous.isNumber {
+        result.append("_")
+      }
+      result.append(contentsOf: character.lowercased())
+      previous = character
+    }
+    return result
+  }
+
+  /// [value] with only what the standard message codec encodes: an
+  /// unsupported value raises an exception when the event is sent. Nil is
+  /// NSNull; anything else unsupported becomes its string form.
+  static func codecSafe(_ value: Any?) -> Any {
+    guard let value = unwrapped(value) else { return NSNull() }
+    switch value {
+    case is NSNull, is String, is NSNumber:
+      return value
+    case let dictionary as [AnyHashable: Any]:
+      var safe: [String: Any] = [:]
+      for (key, item) in dictionary {
+        safe[String(describing: key.base)] = codecSafe(item)
+      }
+      return safe
+    case let array as [Any]:
+      return array.map { codecSafe($0) }
+    default:
+      return String(describing: value)
+    }
+  }
+
+  /// [value] with any `Optional` layers removed; nil for a nil inside them.
+  private static func unwrapped(_ value: Any?) -> Any? {
+    guard let value = value else { return nil }
+    let mirror = Mirror(reflecting: value)
+    guard mirror.displayStyle == .optional else { return value }
+    guard let wrapped = mirror.children.first else { return nil }
+    return unwrapped(wrapped.value)
   }
 
   private func createPermissionRequestedEvent(_ event: PermissionRequestedEvent) -> [String: Any] {
