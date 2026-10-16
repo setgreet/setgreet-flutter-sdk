@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-16
+
+This release carries the version of the native SDKs it bundles (1.8.0).
+
+### Changed
+
+- Upgraded native Android and iOS SDK dependencies to 1.8.0. `onActionTriggered` now reports each button's action as it runs, and `onError` reports a flow that could not be shown, with its error type. If you forward Track Event buttons to your analytics, do it in `onTrackEvent` only, since `onActionTriggered` reports the same tap.
+
 ### Added
 
 - `onCustomAction` and `onTrackEvent` callbacks, with matching `CustomActionEvent` and `TrackEventEvent` on `Setgreet.flowEvents`. They fire when the user taps a button or card whose action is Custom Action (with its custom data) or Track Event (with the event name and properties, to forward to your own analytics).
