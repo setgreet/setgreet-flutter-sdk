@@ -39,6 +39,7 @@ jobs:
         if: steps.info.outputs.PLATFORM == 'ios'
         run: |
           sed -i "s/s.dependency 'SetgreetSDK', '[^']*'/s.dependency 'SetgreetSDK', '${{ steps.info.outputs.VERSION }}'/" ios/setgreet.podspec
+          sed -i "s/ss.dependency 'SetgreetSDKLottie', '[^']*'/ss.dependency 'SetgreetSDKLottie', '${{ steps.info.outputs.VERSION }}'/" ios/setgreet.podspec
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

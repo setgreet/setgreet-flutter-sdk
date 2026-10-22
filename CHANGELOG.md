@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Setgreet.registerLottie()` turns on Lottie animations in flows. On iOS it needs the opt-in `setgreet/Lottie` pod (see the README); without it, Lottie components render nothing on iOS. On Android the native SDK already includes Lottie, so the call always returns `true`. It returns `false`, rather than throwing, when the native plugin does not answer. The README covers Podfiles with static frameworks (`use_frameworks! :linkage => :static`).
+
 ## [1.8.0] - 2026-10-16
 
 This release carries the version of the native SDKs it bundles (1.8.0).

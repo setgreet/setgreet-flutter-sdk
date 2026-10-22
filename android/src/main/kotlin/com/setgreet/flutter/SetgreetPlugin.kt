@@ -445,6 +445,11 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
       "getAnonymousId" -> {
         result.success(Setgreet.anonymousId)
       }
+      // The Android SDK renders Lottie out of the box (it depends on
+      // lottie-compose): nothing to register, Lottie is always available.
+      "registerLottie" -> {
+        result.success(true)
+      }
       "setPurchaseProvider" -> {
         try {
           val providerId = call.argument<String>("providerId")

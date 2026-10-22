@@ -18,6 +18,18 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.dependency 'SetgreetSDK', '1.8.0'
+
+  # `pod 'setgreet'` (what Flutter adds) installs the root spec only, so apps
+  # that don't opt in to Lottie keep a Lottie-free build.
+  s.default_subspecs = :none
+
+  # Opt-in Lottie support: `pod 'setgreet/Lottie', :path => '.symlinks/plugins/setgreet/ios'`
+  # in the app's Podfile adds the SetgreetSDKLottie module (and lottie-ios),
+  # which `Setgreet.registerLottie()` then registers. Keep the version in step
+  # with SetgreetSDK above (SetgreetSDKLottie requires that exact version).
+  s.subspec 'Lottie' do |ss|
+    ss.dependency 'SetgreetSDKLottie', '1.8.0'
+  end
   s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.

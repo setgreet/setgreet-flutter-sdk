@@ -116,6 +116,11 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
+      // Lottie animations (opt-in). On iOS this needs the `setgreet/Lottie`
+      // pod (see ios/Podfile); without it Lottie components render nothing.
+      final lottieAvailable = await Setgreet.registerLottie();
+      _addLog('Lottie support: ${lottieAvailable ? 'on' : 'off'}');
+
       await Setgreet.initialize(
         appKey,
         config: SetgreetConfig(debugMode: exampleConfig.debugMode),

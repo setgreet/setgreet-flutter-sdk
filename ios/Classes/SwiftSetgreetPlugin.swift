@@ -1,6 +1,10 @@
 import Flutter
 import UIKit
 import SetgreetSDK
+// Present only when the app opted in with the `setgreet/Lottie` pod.
+#if canImport(SetgreetSDKLottie)
+import SetgreetSDKLottie
+#endif
 
 public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
@@ -415,11 +419,26 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       handleShowFlow(call, result: result)
     case "getAnonymousId":
       result(Setgreet.shared.anonymousId)
+    case "registerLottie":
+      result(registerLottie())
     case "setPurchaseProvider":
       handleSetPurchaseProvider(call, result: result)
     default:
       result(FlutterMethodNotImplemented)
     }
+  }
+
+  /// Registers the optional Lottie component (method calls arrive on the main
+  /// thread, where the registry is read). Returns whether Lottie can render:
+  /// false when the app did not install the `setgreet/Lottie` pod, in which
+  /// case a Lottie component in a flow renders nothing.
+  private func registerLottie() -> Bool {
+    #if canImport(SetgreetSDKLottie)
+    SetgreetLottie.register()
+    return true
+    #else
+    return false
+    #endif
   }
 
   private func handleInitialize(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

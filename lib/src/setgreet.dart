@@ -402,6 +402,31 @@ class Setgreet {
     }
   }
 
+  /// Turns on Lottie animations in Setgreet flows.
+  ///
+  /// Call it once at startup, before the first flow shows. It does not need
+  /// [initialize] first. Without it, a Lottie component in a flow renders
+  /// nothing on iOS; the rest of the flow is unaffected.
+  ///
+  /// iOS: needs the opt-in `setgreet/Lottie` pod in your Podfile (see the
+  /// README), which adds the `SetgreetSDKLottie` module and `lottie-ios`.
+  /// Returns `false` when that pod is not installed.
+  ///
+  /// Android: the core SDK already includes Lottie, so this always returns
+  /// `true` and changes nothing.
+  ///
+  /// Also returns `false` when the native plugin does not answer the call
+  /// (a [MissingPluginException], for example on a platform without it).
+  static Future<bool> registerLottie() async {
+    try {
+      return await _channel.invokeMethod<bool>('registerLottie') ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+
   /// Ensure the SDK is initialized before performing operations
   static void _ensureInitialized() {
     if (!_initialized) {

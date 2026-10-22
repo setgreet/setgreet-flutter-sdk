@@ -42,6 +42,66 @@ cd ios && pod install
 
 No additional setup required for Android.
 
+### 4. Lottie animations (optional)
+
+> [!WARNING]
+> A missing or incomplete Podfile setup for Lottie still builds without errors, then **crashes at launch**, for example with `dyld: Library not loaded: @rpath/Lottie.framework/Lottie` (referenced from `SetgreetSDKLottie.framework`). Apply every Podfile line below. A Podfile allows only one `pre_install` and one `post_install` block, so **merge** these lines into the blocks your Podfile already has instead of adding second ones.
+
+Lottie support is opt-in on iOS, so apps that don't use it stay smaller. Without it, a Lottie component in a flow renders nothing on iOS; the rest of the flow is unaffected. On Android the native SDK already includes Lottie.
+
+**iOS:** add the `setgreet/Lottie` pod to your `ios/Podfile`. It brings in the `SetgreetSDKLottie` module and `lottie-ios`. `SetgreetSDKLottie` is a prebuilt dynamic framework that loads `@rpath/Lottie.framework`, built with library evolution, so `lottie-ios` must be built as a dynamic framework with library evolution too.
+
+With dynamic frameworks (`use_frameworks!`, Flutter's default), add the pod and one setting to the `post_install` block Flutter generated:
+
+```ruby
+use_frameworks!
+
+target 'Runner' do
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  pod 'setgreet/Lottie', :path => '.symlinks/plugins/setgreet/ios'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target) # already in your Podfile
+
+    # Added for Setgreet Lottie
+    if target.name == 'lottie-ios'
+      target.build_configurations.each do |config|
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+    end
+  end
+end
+```
+
+**Static frameworks** (`use_frameworks! :linkage => :static`): pods are then built as static frameworks, and `SetgreetSDKLottie` cannot load a static Lottie, so the app crashes at launch with the error above. Keep the pod line and the `post_install` setting, and also build just `lottie-ios` as a dynamic framework in `pre_install` (merge it into yours if you already have one):
+
+```ruby
+use_frameworks! :linkage => :static
+
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if pod.name == 'lottie-ios'
+      def pod.build_type
+        Pod::BuildType.dynamic_framework
+      end
+    end
+  end
+end
+```
+
+Then run `cd ios && pod install`.
+
+**Register at startup**, once, before the first flow shows:
+
+```dart
+await Setgreet.registerLottie(); // true when Lottie can render
+```
+
+`registerLottie()` returns `false` on iOS when the `setgreet/Lottie` pod is not installed. On Android it always returns `true`. The [example app](example) does both steps.
+
 ## Usage
 
 ### Initialization
