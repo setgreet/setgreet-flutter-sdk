@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Setgreet.setLocale(String? locale)` sets the language flows are shown in on this device, for example from your app's language picker. The choice is saved on the device, survives relaunches and `resetUser`, and works before `initialize`. `null` or an empty string returns to the device language, and an invalid tag is ignored with a warning. Flows are shown in the `setLocale` override, else the last explicit `identifyUser` locale for the current user, else the user's locale saved on the server, else the device language.
 - `Setgreet.registerLottie()` turns on Lottie animations in flows. On iOS it needs the opt-in `setgreet/Lottie` pod (see the README); without it, Lottie components render nothing on iOS. On Android the native SDK already includes Lottie, so the call always returns `true`. It returns `false`, rather than throwing, when the native plugin does not answer. The README covers Podfiles with static frameworks (`use_frameworks! :linkage => :static`).
 
 ## [1.8.0] - 2026-10-16

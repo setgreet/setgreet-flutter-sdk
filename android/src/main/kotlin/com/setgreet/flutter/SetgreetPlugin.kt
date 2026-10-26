@@ -395,6 +395,16 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
           result.error("USER_ERROR", e.message ?: "Failed to reset user", null)
         }
       }
+      "setLocale" -> {
+        // Works before initialize; null or blank clears the override, and the
+        // native SDK ignores an invalid tag with a warning.
+        try {
+          Setgreet.setLocale(call.argument<String>("locale"))
+          result.success(null)
+        } catch (e: Exception) {
+          result.error("LOCALE_ERROR", e.message ?: "Failed to set the locale", null)
+        }
+      }
       "trackEvent" -> {
         try {
           val eventName = call.argument<String>("eventName")

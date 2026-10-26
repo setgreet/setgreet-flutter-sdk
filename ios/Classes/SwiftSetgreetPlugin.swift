@@ -411,6 +411,8 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       handleIdentifyUser(call, result: result)
     case "resetUser":
       handleResetUser(call, result: result)
+    case "setLocale":
+      handleSetLocale(call, result: result)
     case "trackEvent":
       handleTrackEvent(call, result: result)
     case "trackScreen":
@@ -492,6 +494,14 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
 
   private func handleResetUser(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     Setgreet.shared.resetUser()
+    result(nil)
+  }
+
+  /// Saves the device's language choice. Works before `initialize`; nil or
+  /// empty clears it, and the native SDK ignores an invalid tag with a warning.
+  private func handleSetLocale(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    let args = call.arguments as? [String: Any]
+    Setgreet.shared.setLocale(args?["locale"] as? String)
     result(nil)
   }
 

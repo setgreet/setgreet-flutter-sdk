@@ -152,6 +152,43 @@ class Setgreet {
     }
   }
 
+  /// Sets the language Setgreet shows flows in on this device: an explicit
+  /// language choice, for example from your app's language picker.
+  ///
+  /// The choice is saved on the device. It survives relaunches and
+  /// [resetUser], and is never stored on the user. It can be called before
+  /// [initialize].
+  ///
+  /// Flows are shown in, in order:
+  /// 1. this override,
+  /// 2. else the last explicit `locale` passed to [identifyUser] for the
+  ///    current user,
+  /// 3. else the user's locale saved on the server,
+  /// 4. else the device language.
+  ///
+  /// [locale] is a BCP-47 tag such as `"tr-TR"`, `"pt-BR"` or `"de"`. `null`
+  /// or an empty string removes the override, so the rest of the order
+  /// applies again. An invalid tag is ignored with a warning (logged in debug
+  /// mode) and the previous locale stays.
+  ///
+  /// Example:
+  /// ```dart
+  /// await Setgreet.setLocale('tr-TR');
+  /// await Setgreet.setLocale(null); // back to the device language
+  /// ```
+  ///
+  /// Throws [SetgreetException] if the native SDK rejects the call.
+  static Future<void> setLocale(String? locale) async {
+    try {
+      await _channel.invokeMethod('setLocale', {'locale': locale});
+    } on PlatformException catch (e) {
+      throw SetgreetException(
+        e.message ?? 'Failed to set the locale',
+        code: e.code,
+      );
+    }
+  }
+
   /// Track a custom event
   ///
   /// [eventName] - Name of the event to track

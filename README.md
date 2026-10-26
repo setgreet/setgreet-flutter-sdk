@@ -178,6 +178,24 @@ await Setgreet.identifyUser(
 );
 ```
 
+### Language
+
+Call `setLocale` when the user picks a language in your app. The choice is saved on the device: it survives relaunches and `resetUser`, and it works before `initialize`, so anonymous users get localized flows too.
+
+```dart
+await Setgreet.setLocale('tr-TR'); // a BCP-47 tag
+await Setgreet.setLocale(null);    // back to the device language
+```
+
+Flows are shown in, in order:
+
+1. The `setLocale` override.
+2. The last explicit `locale` passed to `identifyUser` for the current user.
+3. The user's locale saved on the server.
+4. The device language.
+
+`null` or an empty string removes the override. An invalid tag is ignored with a warning, and the previous locale stays.
+
 ### Reset User
 
 Clears user identification data and resets user session state for logout scenarios.
