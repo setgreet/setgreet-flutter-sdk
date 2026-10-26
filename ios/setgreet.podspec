@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   # which `Setgreet.registerLottie()` then registers. Keep the version in step
   # with SetgreetSDK above (SetgreetSDKLottie requires that exact version).
   s.subspec 'Lottie' do |ss|
-    ss.dependency 'SetgreetSDKLottie', '1.8.0'
+    ss.dependency 'SetgreetSDKLottie', '1.9.0'
   end
   s.platform = :ios, '15.0'
 
