@@ -164,7 +164,7 @@ Identifies a user for Setgreet analytics and flow management.
 - `userId` (String): The unique identifier for the user
 - `attributes` (Optional): Additional user attributes
 - `operation` (Optional): Operation type ('create' or 'update', defaults to 'create')
-- `locale` (Optional): User's locale (e.g., "en-US"). If not provided, uses device's default locale
+- `locale` (Optional): User's locale (e.g., "en-US"). Saved for the user only when you pass one; the device language is never stored. See [Language](#language) for the order Setgreet uses
 
 ```dart
 await Setgreet.identifyUser(

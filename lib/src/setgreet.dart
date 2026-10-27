@@ -107,7 +107,7 @@ class Setgreet {
   /// [userId] - Unique identifier for the user
   /// [attributes] - Optional user attributes as key-value pairs
   /// [operation] - Optional operation type ('create' or 'update', defaults to 'create')
-  /// [locale] - Optional user locale (e.g., "en-US"). If not provided, uses device's default locale
+  /// [locale] - Optional user locale (e.g., "en-US"). Saved for the user only when you pass one; see [setLocale] for the order Setgreet uses
   ///
   /// Throws [SetgreetUserException] if user identification fails
   static Future<void> identifyUser(
