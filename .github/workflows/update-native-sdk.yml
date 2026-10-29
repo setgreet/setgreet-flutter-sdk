@@ -19,9 +19,11 @@ jobs:
 
       - name: Extract platform and version
         id: info
+        env:
+          VERSION: ${{ github.event.client_payload.version }}
+          EVENT_TYPE: ${{ github.event.action }}
         run: |
-          VERSION="${{ github.event.client_payload.version }}"
-          EVENT_TYPE="${{ github.event.action }}"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "::error::invalid version"; exit 1; }
           if [ "$EVENT_TYPE" = "android-sdk-release" ]; then
             PLATFORM="android"
           else
@@ -32,14 +34,18 @@ jobs:
 
       - name: Update Android dependency
         if: steps.info.outputs.PLATFORM == 'android'
+        env:
+          VERSION: ${{ steps.info.outputs.VERSION }}
         run: |
-          sed -i "s/implementation 'com.setgreet:setgreet:[^']*'/implementation 'com.setgreet:setgreet:${{ steps.info.outputs.VERSION }}'/" android/build.gradle
+          sed -i "s/implementation 'com.setgreet:setgreet:[^']*'/implementation 'com.setgreet:setgreet:$VERSION'/" android/build.gradle
 
       - name: Update iOS dependency
         if: steps.info.outputs.PLATFORM == 'ios'
+        env:
+          VERSION: ${{ steps.info.outputs.VERSION }}
         run: |
-          sed -i "s/s.dependency 'SetgreetSDK', '[^']*'/s.dependency 'SetgreetSDK', '${{ steps.info.outputs.VERSION }}'/" ios/setgreet.podspec
-          sed -i "s/ss.dependency 'SetgreetSDKLottie', '[^']*'/ss.dependency 'SetgreetSDKLottie', '${{ steps.info.outputs.VERSION }}'/" ios/setgreet.podspec
+          sed -i "s/s.dependency 'SetgreetSDK', '[^']*'/s.dependency 'SetgreetSDK', '$VERSION'/" ios/setgreet.podspec
+          sed -i "s/ss.dependency 'SetgreetSDKLottie', '[^']*'/ss.dependency 'SetgreetSDKLottie', '$VERSION'/" ios/setgreet.podspec
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
