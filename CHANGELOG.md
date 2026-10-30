@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-30
+
+This release carries the version of the native SDKs it bundles (1.10.0).
+
+### Changed
+
+- Upgraded native Android and iOS SDK dependencies to 1.10.0. No changes to how flows appear in your app.
+
+## [1.9.0] - 2026-10-26
+
+This release carries the version of the native SDKs it bundles (1.9.0).
+
 ### Added
 
 - `Setgreet.setLocale(String? locale)` sets the language flows are shown in on this device, for example from your app's language picker. The choice is saved on the device, survives relaunches and `resetUser`, and works before `initialize`. `null` or an empty string returns to the device language, and an invalid tag is ignored with a warning. Flows are shown in the `setLocale` override, else the last explicit `identifyUser` locale for the current user, else the user's locale saved on the server, else the device language.
