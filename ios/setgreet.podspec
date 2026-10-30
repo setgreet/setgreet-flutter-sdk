@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'SetgreetSDK', '1.9.0'
+  s.dependency 'SetgreetSDK', '1.10.0'
 
   # `pod 'setgreet'` (what Flutter adds) installs the root spec only, so apps
   # that don't opt in to Lottie keep a Lottie-free build.
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   # which `Setgreet.registerLottie()` then registers. Keep the version in step
   # with SetgreetSDK above (SetgreetSDKLottie requires that exact version).
   s.subspec 'Lottie' do |ss|
-    ss.dependency 'SetgreetSDKLottie', '1.9.0'
+    ss.dependency 'SetgreetSDKLottie', '1.10.0'
   end
   s.platform = :ios, '15.0'
 
