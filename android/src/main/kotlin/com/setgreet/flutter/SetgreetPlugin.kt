@@ -370,6 +370,7 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
           val attributes = call.argument<Map<String, Any>>("attributes")
           val operation = call.argument<String>("operation")
           val locale = call.argument<String>("locale")
+          val userHash = call.argument<String>("userHash")
 
           if (userId == null || userId.isEmpty()) {
             result.error("INVALID_ARGUMENT", "User ID cannot be empty", null)
@@ -381,7 +382,7 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
             else -> com.setgreet.model.Operation.CREATE
           }
 
-          Setgreet.identifyUser(userId!!, attributes, op, locale)
+          Setgreet.identifyUser(userId!!, attributes, op, locale, userHash)
           result.success(null)
         } catch (e: Exception) {
           result.error("USER_ERROR", e.message ?: "Failed to identify user", null)

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Setgreet.identifyUser` takes an optional `userHash`: the hex HMAC-SHA256 of the user id, computed on your server with your app's identity verification secret. Setgreet uses it to verify that a user id belongs to the signed-in user. See "Verify Users" in the README.
+
 ## [1.10.0] - 2026-10-30
 
 This release carries the version of the native SDKs it bundles (1.10.0).

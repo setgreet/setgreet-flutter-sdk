@@ -108,6 +108,7 @@ class Setgreet {
   /// [attributes] - Optional user attributes as key-value pairs
   /// [operation] - Optional operation type ('create' or 'update', defaults to 'create')
   /// [locale] - Optional user locale (e.g., "en-US"). Saved for the user only when you pass one; see [setLocale] for the order Setgreet uses
+  /// [userHash] - Optional hex HMAC-SHA256 of [userId], computed on your server with your app's identity verification secret. Lets Setgreet verify that the user id belongs to the signed-in user. Keep the secret on your server, never in the app
   ///
   /// Throws [SetgreetUserException] if user identification fails
   static Future<void> identifyUser(
@@ -115,6 +116,7 @@ class Setgreet {
     Map<String, dynamic>? attributes,
     String? operation,
     String? locale,
+    String? userHash,
   }) async {
     try {
       _ensureInitialized();
@@ -128,6 +130,7 @@ class Setgreet {
         'attributes': attributes ?? {},
         'operation': operation ?? 'create',
         'locale': locale,
+        'userHash': userHash,
       });
     } on PlatformException catch (e) {
       throw SetgreetUserException(
