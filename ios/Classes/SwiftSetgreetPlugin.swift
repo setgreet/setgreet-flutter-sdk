@@ -480,6 +480,7 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     let attributes = args["attributes"] as? [String: Any]
     let operation = args["operation"] as? String
     let locale = args["locale"] as? String
+    let userHash = args["userHash"] as? String
 
     let op: SetgreetSDK.Operation = (operation?.lowercased() == "update") ? .update : .create
 
@@ -487,7 +488,8 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
       userId: userId,
       attributes: attributes,
       operation: op,
-      locale: locale
+      locale: locale,
+      userHash: userHash
     )
     result(nil)
   }
