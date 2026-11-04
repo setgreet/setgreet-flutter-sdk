@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Native SDKs updated to Android 1.11.0 and iOS 1.11.0.
+- iOS: the plugin now supports Swift Package Manager (the default from Flutter 3.44) through a Swift package that depends on `setgreet-ios-sdk` at the bundled version, and it ships the iOS SDK's prebuilt frameworks for CocoaPods projects, so the `SetgreetSDK` and `SetgreetSDKLottie` pods are no longer fetched from the CocoaPods registry. Nothing changes in your Podfile. Lottie on Swift Package Manager is set up in Xcode; see "Lottie animations" in the README.
 
 ### Added
 

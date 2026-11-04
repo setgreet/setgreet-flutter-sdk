@@ -1,0 +1,4 @@
+framework module SetgreetSDKLottie {
+  header "SetgreetSDKLottie-Swift.h"
+  requires objc
+}

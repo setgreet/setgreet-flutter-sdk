@@ -1,0 +1,6 @@
+framework module SetgreetSDK {
+  umbrella header "SetgreetSDK.h"
+  export *
+
+  module * { export * }
+}

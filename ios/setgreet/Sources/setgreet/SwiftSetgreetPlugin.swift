@@ -1,7 +1,9 @@
 import Flutter
 import UIKit
 import SetgreetSDK
-// Present only when the app opted in with the `setgreet/Lottie` pod.
+// Present only when the app opted in with the `setgreet/Lottie` pod. Under
+// Swift Package Manager the app links the SetgreetSDKLottie product itself, so
+// this target cannot import it; `registerLottie()` finds it at runtime instead.
 #if canImport(SetgreetSDKLottie)
 import SetgreetSDKLottie
 #endif
@@ -432,15 +434,32 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
 
   /// Registers the optional Lottie component (method calls arrive on the main
   /// thread, where the registry is read). Returns whether Lottie can render:
-  /// false when the app did not install the `setgreet/Lottie` pod, in which
-  /// case a Lottie component in a flow renders nothing.
+  /// false when the app added neither the `setgreet/Lottie` pod nor the
+  /// `SetgreetSDKLottie` Swift package product, in which case a Lottie
+  /// component in a flow renders nothing.
   private func registerLottie() -> Bool {
     #if canImport(SetgreetSDKLottie)
     SetgreetLottie.register()
     return true
     #else
-    return false
+    return Self.registerLottieFromLinkedModule()
     #endif
+  }
+
+  /// `SetgreetLottie.register()` as exported by the SetgreetSDKLottie
+  /// framework when the app links it directly (the Swift Package Manager
+  /// setup; see the README). This target has no compile-time dependency on
+  /// that module, so the entry point is looked up in the running process.
+  /// `SetgreetLottie` is a Swift enum, so `NSClassFromString` cannot find it.
+  /// Returns false when the framework is not loaded. Internal so the example's
+  /// RunnerTests can pin the entry point against the bundled framework.
+  static func registerLottieFromLinkedModule() -> Bool {
+    let symbolName = "$s17SetgreetSDKLottie0A6LottieO8registeryyFZ"
+    let handle = UnsafeMutableRawPointer(bitPattern: -2) // RTLD_DEFAULT
+    guard let symbol = dlsym(handle, symbolName) else { return false }
+    typealias RegisterFunction = @convention(c) () -> Void
+    unsafeBitCast(symbol, to: RegisterFunction.self)()
+    return true
   }
 
   private func handleInitialize(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
