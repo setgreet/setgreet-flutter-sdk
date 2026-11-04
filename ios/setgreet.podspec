@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Setgreet' => 'support@setgreet.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'setgreet/Sources/setgreet/**/*.swift'
   s.dependency 'Flutter'
   s.dependency 'SetgreetSDK', '1.11.0'
 
