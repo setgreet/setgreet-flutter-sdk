@@ -44,8 +44,18 @@ jobs:
         env:
           VERSION: ${{ steps.info.outputs.VERSION }}
         run: |
-          sed -i "s/s.dependency 'SetgreetSDK', '[^']*'/s.dependency 'SetgreetSDK', '$VERSION'/" ios/setgreet.podspec
-          sed -i "s/ss.dependency 'SetgreetSDKLottie', '[^']*'/ss.dependency 'SetgreetSDKLottie', '$VERSION'/" ios/setgreet.podspec
+          # Swift Package Manager path: the exact version Package.swift resolves.
+          sed -i -E "/setgreet-ios-sdk\.git/ s/exact: \"[^\"]*\"/exact: \"$VERSION\"/" ios/setgreet/Package.swift
+          grep -q "exact: \"$VERSION\"" ios/setgreet/Package.swift || { echo "::error::Package.swift pin not updated"; exit 1; }
+
+          # CocoaPods path: refresh the vendored xcframeworks from the same tag.
+          git clone --depth 1 --branch "$VERSION" https://github.com/setgreet/setgreet-ios-sdk.git /tmp/setgreet-ios-sdk
+          rm -rf ios/Frameworks/SetgreetSDK.xcframework ios/Frameworks/SetgreetSDKLottie.xcframework
+          mkdir -p ios/Frameworks
+          git -C /tmp/setgreet-ios-sdk archive HEAD SetgreetSDK.xcframework SetgreetSDKLottie.xcframework | tar -x -C ios/Frameworks
+          test -f ios/Frameworks/SetgreetSDK.xcframework/Info.plist || { echo "::error::SetgreetSDK.xcframework missing"; exit 1; }
+          test -f ios/Frameworks/SetgreetSDKLottie.xcframework/Info.plist || { echo "::error::SetgreetSDKLottie.xcframework missing"; exit 1; }
+          rm -rf /tmp/setgreet-ios-sdk
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
