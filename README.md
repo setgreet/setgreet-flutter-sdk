@@ -30,9 +30,11 @@ flutter pub get
 
 ### 2. iOS Setup
 
-#### Install CocoaPods Dependencies
+The plugin bundles the Setgreet iOS SDK, so there is nothing to add on either dependency manager.
 
-The iOS SDK will be automatically included via CocoaPods. Make sure to run:
+**Swift Package Manager** (the default from Flutter 3.44): the plugin ships a Swift package (`ios/setgreet/Package.swift`) that depends on [setgreet-ios-sdk](https://github.com/setgreet/setgreet-ios-sdk) at the exact version this release was built with. Flutter resolves it when you build or run the app.
+
+**CocoaPods** (projects that have not moved to Swift Package Manager yet, and Flutter versions before 3.44): the same SDK is included as prebuilt frameworks inside the plugin, so no extra pod source is needed. Run:
 
 ```bash
 cd ios && pod install
@@ -49,7 +51,14 @@ No additional setup required for Android.
 
 Lottie support is opt-in on iOS, so apps that don't use it stay smaller. Without it, a Lottie component in a flow renders nothing on iOS; the rest of the flow is unaffected. On Android the native SDK already includes Lottie.
 
-**iOS:** add the `setgreet/Lottie` pod to your `ios/Podfile`. It brings in the `SetgreetSDKLottie` module and `lottie-ios`. `SetgreetSDKLottie` is a prebuilt dynamic framework that loads `@rpath/Lottie.framework`, built with library evolution, so `lottie-ios` must be built as a dynamic framework with library evolution too.
+**iOS with Swift Package Manager:** the plugin cannot add an optional product for you, so add it to the app in Xcode (`ios/Runner.xcworkspace`, File > Add Package Dependencies):
+
+1. `https://github.com/setgreet/setgreet-ios-sdk.git`, **Exact Version** set to the iOS SDK version this plugin release bundles (see the CHANGELOG entry for your version, or the `exact:` line in the plugin's `ios/setgreet/Package.swift`). Add the `SetgreetSDKLottie` product to the Runner target. The version must match the plugin's, since both resolve the same package.
+2. `https://github.com/airbnb/lottie-spm.git`, from `4.6.0`. Add the `Lottie` product to the Runner target. `SetgreetSDKLottie` is a prebuilt framework and cannot declare this dependency itself.
+
+Then register at startup (below). No Podfile changes are needed; if your Podfile still has a `pod 'setgreet/Lottie'` line from a CocoaPods setup, remove it so the plugin is not linked twice.
+
+**iOS with CocoaPods:** add the `setgreet/Lottie` pod to your `ios/Podfile`. It brings in the `SetgreetSDKLottie` module and `lottie-ios`. `SetgreetSDKLottie` is a prebuilt dynamic framework that loads `@rpath/Lottie.framework`, built with library evolution, so `lottie-ios` must be built as a dynamic framework with library evolution too.
 
 With dynamic frameworks (`use_frameworks!`, Flutter's default), add the pod and one setting to the `post_install` block Flutter generated:
 
@@ -100,7 +109,7 @@ Then run `cd ios && pod install`.
 await Setgreet.registerLottie(); // true when Lottie can render
 ```
 
-`registerLottie()` returns `false` on iOS when the `setgreet/Lottie` pod is not installed. On Android it always returns `true`. The [example app](example) does both steps.
+`registerLottie()` returns `false` on iOS when neither the `setgreet/Lottie` pod nor the `SetgreetSDKLottie` Swift package product is in the app. On Android it always returns `true`. The [example app](example) does both steps with CocoaPods.
 
 ## Usage
 
