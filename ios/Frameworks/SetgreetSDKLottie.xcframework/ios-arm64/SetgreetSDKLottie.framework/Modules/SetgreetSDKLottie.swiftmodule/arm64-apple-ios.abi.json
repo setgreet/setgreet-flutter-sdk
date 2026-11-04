@@ -1,0 +1,201 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "SetgreetSDKLottie",
+    "printedName": "SetgreetSDKLottie",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "SwiftUI",
+        "printedName": "SwiftUI",
+        "declKind": "Import",
+        "moduleName": "SetgreetSDKLottie",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Lottie",
+        "printedName": "Lottie",
+        "declKind": "Import",
+        "moduleName": "SetgreetSDKLottie"
+      },
+      {
+        "kind": "Import",
+        "name": "SetgreetSDK",
+        "printedName": "SetgreetSDK",
+        "declKind": "Import",
+        "moduleName": "SetgreetSDKLottie"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "LottieComponent",
+        "printedName": "LottieComponent",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "componentType",
+            "printedName": "componentType",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:17SetgreetSDKLottie15LottieComponentV13componentTypeSSvpZ",
+            "mangledName": "$s17SetgreetSDKLottie15LottieComponentV13componentTypeSSvpZ",
+            "moduleName": "SetgreetSDKLottie",
+            "static": true,
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:17SetgreetSDKLottie15LottieComponentV13componentTypeSSvgZ",
+                "mangledName": "$s17SetgreetSDKLottie15LottieComponentV13componentTypeSSvgZ",
+                "moduleName": "SetgreetSDKLottie",
+                "static": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "render",
+            "printedName": "render(instance:context:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AnyView",
+                "printedName": "SwiftUI.AnyView",
+                "usr": "s:7SwiftUI7AnyViewV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ComponentInstance",
+                "printedName": "SetgreetSDK.ComponentInstance",
+                "usr": "s:11SetgreetSDK17ComponentInstanceV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ComponentContext",
+                "printedName": "SetgreetSDK.ComponentContext",
+                "usr": "s:11SetgreetSDK16ComponentContextV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:17SetgreetSDKLottie15LottieComponentV6render8instance7context7SwiftUI7AnyViewV0A3SDK0D8InstanceV_AJ0D7ContextVtFZ",
+            "mangledName": "$s17SetgreetSDKLottie15LottieComponentV6render8instance7context7SwiftUI7AnyViewV0A3SDK0D8InstanceV_AJ0D7ContextVtFZ",
+            "moduleName": "SetgreetSDKLottie",
+            "static": true,
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:17SetgreetSDKLottie15LottieComponentV",
+        "mangledName": "$s17SetgreetSDKLottie15LottieComponentV",
+        "moduleName": "SetgreetSDKLottie",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SetgreetComponentProtocol",
+            "printedName": "SetgreetComponentProtocol",
+            "usr": "s:11SetgreetSDK0A17ComponentProtocolP",
+            "mangledName": "$s11SetgreetSDK0A17ComponentProtocolP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "SetgreetLottie",
+        "printedName": "SetgreetLottie",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "register",
+            "printedName": "register()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:17SetgreetSDKLottie0A6LottieO8registeryyFZ",
+            "mangledName": "$s17SetgreetSDKLottie0A6LottieO8registeryyFZ",
+            "moduleName": "SetgreetSDKLottie",
+            "static": true,
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:17SetgreetSDKLottie0A6LottieO",
+        "mangledName": "$s17SetgreetSDKLottie0A6LottieO",
+        "moduleName": "SetgreetSDKLottie",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": []
+}
