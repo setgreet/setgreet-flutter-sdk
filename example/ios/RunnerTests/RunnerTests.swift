@@ -575,3 +575,23 @@ final class FlowEventMapsTests: XCTestCase {
     XCTAssertEqual(list?[2] as? Bool, true)
   }
 }
+
+// MARK: - Lottie entry point looked up at runtime
+
+/// Under Swift Package Manager the plugin cannot import SetgreetSDKLottie, so
+/// `registerLottie()` resolves `SetgreetLottie.register()` by its exported
+/// symbol instead. This build links the module through the `setgreet/Lottie`
+/// pod, so the lookup must find it; a rename in the iOS SDK shows up here.
+final class LottieRuntimeLookupTests: XCTestCase {
+  func testRegisterEntryPointIsExportedByTheBundledFramework() {
+    let handle = UnsafeMutableRawPointer(bitPattern: -2) // RTLD_DEFAULT
+    XCTAssertNotNil(dlsym(handle, "$s17SetgreetSDKLottie0A6LottieO8registeryyFZ"))
+  }
+
+  func testRuntimeRegistrationFindsTheLinkedModule() {
+    XCTAssertTrue(SetgreetPlugin.registerLottieFromLinkedModule())
+    // Registering twice is what an app calling `registerLottie()` after a
+    // hot restart does; it must stay harmless.
+    XCTAssertTrue(SetgreetPlugin.registerLottieFromLinkedModule())
+  }
+}
