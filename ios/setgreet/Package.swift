@@ -26,7 +26,7 @@ let hasFlutterFramework = flutterFrameworkCandidates.contains {
 var packageDependencies: [Package.Dependency] = [
     // Keep this exact version in step with ios/Frameworks (the CocoaPods path)
     // and android/build.gradle. The update-native-sdk workflow rewrites it.
-    .package(url: "https://github.com/setgreet/setgreet-ios-sdk.git", exact: "1.11.0"),
+    .package(url: "https://github.com/setgreet/setgreet-ios-sdk.git", exact: "1.11.1"),
 ]
 var targetDependencies: [Target.Dependency] = [
     .product(name: "SetgreetSDK", package: "setgreet-ios-sdk"),
