@@ -1,6 +1,7 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
-// swift-module-flags: -target arm64-apple-ios15.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name SetgreetSDK
+// swift-compiler-version: Apple Swift version 6.1.2 effective-5.10 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)
+// swift-module-flags: -target arm64-apple-ios15.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name SetgreetSDK
+// swift-module-flags-ignorable:  -interface-compiler-version 6.1.2
 import AVFoundation
 import AVKit
 import AppTrackingTransparency
@@ -262,9 +263,9 @@ public struct ScreenAutoAdvance : Swift.Codable, Swift.Hashable {
   public let action: Swift.String?
   public init(delayMs: Swift.Int, action: Swift.String? = nil)
   public init(from decoder: any Swift.Decoder) throws
-  public func hash(into hasher: inout Swift.Hasher)
   public static func == (a: SetgreetSDK.ScreenAutoAdvance, b: SetgreetSDK.ScreenAutoAdvance) -> Swift.Bool
   public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
@@ -273,9 +274,9 @@ public struct ScreenPermissionGate : Swift.Codable, Swift.Hashable {
   public let permission: Swift.String
   public let skipWhen: Swift.String?
   public init(permission: Swift.String, skipWhen: Swift.String? = "granted")
-  public func hash(into hasher: inout Swift.Hasher)
   public static func == (a: SetgreetSDK.ScreenPermissionGate, b: SetgreetSDK.ScreenPermissionGate) -> Swift.Bool
   public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
@@ -312,9 +313,9 @@ public struct ScreenDataError : Swift.Codable, Swift.Hashable {
   public let alias: Swift.String
   public let code: Swift.String?
   public init(alias: Swift.String, code: Swift.String? = nil)
-  public func hash(into hasher: inout Swift.Hasher)
   public static func == (a: SetgreetSDK.ScreenDataError, b: SetgreetSDK.ScreenDataError) -> Swift.Bool
   public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
@@ -1237,9 +1238,9 @@ public struct ScreenTransitionConfig : Swift.Codable, Swift.Hashable {
   public var durationSeconds: Swift.Double {
     get
   }
-  public func hash(into hasher: inout Swift.Hasher)
   public static func == (a: SetgreetSDK.ScreenTransitionConfig, b: SetgreetSDK.ScreenTransitionConfig) -> Swift.Bool
   public func encode(to encoder: any Swift.Encoder) throws
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
@@ -1539,8 +1540,8 @@ public struct SetgreetPurchaseSource : Swift.Hashable {
   public static let currentOffering: SetgreetSDK.SetgreetPurchaseSource
   public static func offering(_ identifier: Swift.String) -> SetgreetSDK.SetgreetPurchaseSource
   public static func placement(_ identifier: Swift.String) -> SetgreetSDK.SetgreetPurchaseSource
-  public func hash(into hasher: inout Swift.Hasher)
   public static func == (a: SetgreetSDK.SetgreetPurchaseSource, b: SetgreetSDK.SetgreetPurchaseSource) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
@@ -1557,8 +1558,8 @@ public struct SetgreetPurchasePeriod : Swift.Hashable {
   public let unit: SetgreetSDK.SetgreetPurchasePeriodUnit
   public let count: Swift.Int
   public init(unit: SetgreetSDK.SetgreetPurchasePeriodUnit, count: Swift.Int)
-  public func hash(into hasher: inout Swift.Hasher)
   public static func == (a: SetgreetSDK.SetgreetPurchasePeriod, b: SetgreetSDK.SetgreetPurchasePeriod) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
@@ -1570,8 +1571,8 @@ public struct SetgreetPurchaseIntroOffer : Swift.Hashable {
   public let eligible: Swift.Bool?
   public init(type: Swift.String, localizedPrice: Swift.String? = nil, periodText: Swift.String? = nil, eligible: Swift.Bool? = nil)
   public static let trialType: Swift.String
-  public func hash(into hasher: inout Swift.Hasher)
   public static func == (a: SetgreetSDK.SetgreetPurchaseIntroOffer, b: SetgreetSDK.SetgreetPurchaseIntroOffer) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
@@ -1586,9 +1587,10 @@ public struct SetgreetPurchaseProduct : Swift.Hashable {
   public let currencyCode: Swift.String
   public let period: SetgreetSDK.SetgreetPurchasePeriod?
   public let introOffer: SetgreetSDK.SetgreetPurchaseIntroOffer?
-  public init(ref: Swift.String, storeProductId: Swift.String, title: Swift.String? = nil, description: Swift.String? = nil, localizedPrice: Swift.String, priceAmount: Foundation.Decimal, currencyCode: Swift.String, period: SetgreetSDK.SetgreetPurchasePeriod? = nil, introOffer: SetgreetSDK.SetgreetPurchaseIntroOffer? = nil)
-  public func hash(into hasher: inout Swift.Hasher)
+  public let priceLocale: Foundation.Locale?
+  public init(ref: Swift.String, storeProductId: Swift.String, title: Swift.String? = nil, description: Swift.String? = nil, localizedPrice: Swift.String, priceAmount: Foundation.Decimal, currencyCode: Swift.String, period: SetgreetSDK.SetgreetPurchasePeriod? = nil, introOffer: SetgreetSDK.SetgreetPurchaseIntroOffer? = nil, priceLocale: Foundation.Locale? = nil)
   public static func == (a: SetgreetSDK.SetgreetPurchaseProduct, b: SetgreetSDK.SetgreetPurchaseProduct) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
   public var hashValue: Swift.Int {
     get
   }
