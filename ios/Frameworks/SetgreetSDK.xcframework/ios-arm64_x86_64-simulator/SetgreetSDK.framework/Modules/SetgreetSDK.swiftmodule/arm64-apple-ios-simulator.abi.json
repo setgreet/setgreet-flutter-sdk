@@ -2831,6 +2831,23 @@
         ]
       },
       {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "SetgreetSDK",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "SwiftUI",
+        "printedName": "SwiftUI",
+        "declKind": "Import",
+        "moduleName": "SetgreetSDK"
+      },
+      {
         "kind": "TypeDecl",
         "name": "SetgreetScreenBackgroundModel",
         "printedName": "SetgreetScreenBackgroundModel",
@@ -59713,168 +59730,168 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 831,
+      "offset": 1138,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "IntegerLiteral",
-      "offset": 3458,
+      "offset": 3765,
       "length": 2,
       "value": "-1"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 3538,
+      "offset": 3845,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 3565,
+      "offset": 3872,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Array",
-      "offset": 3751,
+      "offset": 4058,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Array",
-      "offset": 3798,
+      "offset": 4105,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Array",
-      "offset": 5936,
+      "offset": 6243,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "IntegerLiteral",
-      "offset": 6889,
+      "offset": 7196,
       "length": 1,
       "value": "1"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "BooleanLiteral",
-      "offset": 7188,
+      "offset": 7495,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "IntegerLiteral",
-      "offset": 7643,
+      "offset": 7950,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 8637,
+      "offset": 8944,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 8797,
+      "offset": 9104,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 8974,
+      "offset": 9281,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 9491,
+      "offset": 9798,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Array",
-      "offset": 9751,
+      "offset": 10058,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Array",
-      "offset": 9992,
+      "offset": 10299,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 10166,
+      "offset": 10473,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Dictionary",
-      "offset": 10480,
+      "offset": 10787,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "BooleanLiteral",
-      "offset": 20185,
+      "offset": 20614,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "BooleanLiteral",
-      "offset": 34585,
+      "offset": 35025,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "BooleanLiteral",
-      "offset": 45197,
+      "offset": 45637,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "StringLiteral",
-      "offset": 52450,
+      "offset": 52890,
       "length": 67,
       "value": "\"SetgreetViewModel: no view controller to open a preview link from\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "BooleanLiteral",
-      "offset": 52630,
+      "offset": 53070,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/SetgreetViewModel.swift",
       "kind": "Array",
-      "offset": 60135,
+      "offset": 60575,
       "length": 38,
       "value": "[\"purchased\", \"restored\", \"hasAccess\"]"
     },
@@ -59902,49 +59919,56 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
       "kind": "StringLiteral",
-      "offset": 22966,
+      "offset": 23085,
       "length": 5,
       "value": "\"UTC\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
       "kind": "IntegerLiteral",
-      "offset": 23001,
+      "offset": 23120,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
       "kind": "IntegerLiteral",
-      "offset": 23215,
+      "offset": 23334,
       "length": 4,
       "value": "1900"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
       "kind": "IntegerLiteral",
-      "offset": 23222,
+      "offset": 23341,
       "length": 4,
       "value": "2100"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
       "kind": "StringLiteral",
-      "offset": 23947,
+      "offset": 24066,
       "length": 12,
       "value": "\"yyyy-MM-dd\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
       "kind": "StringLiteral",
-      "offset": 24013,
+      "offset": 24132,
       "length": 14,
       "value": "\"MMM dd, yyyy\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
+      "kind": "Dictionary",
+      "offset": 24268,
+      "length": 3,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Templates\/RequiredInputGate.swift",
       "kind": "Array",
-      "offset": 30374,
+      "offset": 31709,
       "length": 57,
       "value": "[\"chip\", \"quiz\", \"segmentedControl\", \"stepper\", \"switch\"]"
     },
@@ -60063,65 +60087,86 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SetgreetView.swift",
       "kind": "StringLiteral",
-      "offset": 1334,
+      "offset": 2135,
       "length": 14,
       "value": "\"preview-flow\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "StringLiteral",
-      "offset": 1014,
+      "offset": 1091,
       "length": 9,
       "value": "\"Unknown\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "StringLiteral",
-      "offset": 1148,
+      "offset": 1225,
       "length": 23,
       "value": "\"sg:sharedPreviewLabel\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "FloatLiteral",
-      "offset": 1258,
+      "offset": 1335,
       "length": 3,
       "value": "0.2"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "FloatLiteral",
-      "offset": 1355,
+      "offset": 1432,
       "length": 3,
       "value": "3.0"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "FloatLiteral",
-      "offset": 1456,
+      "offset": 1533,
       "length": 3,
       "value": "0.3"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "BooleanLiteral",
-      "offset": 2350,
+      "offset": 2566,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "IntegerLiteral",
-      "offset": 2639,
+      "offset": 2855,
       "length": 13,
       "value": "1000000000"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SharedPreviewLabel.swift",
       "kind": "FloatLiteral",
-      "offset": 6291,
+      "offset": 6507,
       "length": 3,
       "value": "0.7"
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SetgreetStrings.swift",
+      "kind": "Dictionary",
+      "offset": 874,
+      "length": 2972,
+      "value": "[(\"quiz.searchPlaceholder\", \"Search…\"), (\"quiz.noResults\", \"No matches\"), (\"input.required\", \"Answer this to continue\"), (\"input.requiredAnnouncement\", \"Answer the required question to continue\"), (\"dropdown.placeholder\", \"Select an option\"), (\"multiSelect.placeholder\", \"Select options...\"), (\"datePicker.placeholder\", \"Select date...\"), (\"datePicker.ok\", \"OK\"), (\"datePicker.cancel\", \"Cancel\"), (\"rating.empty\", \"No rating\"), (\"nps.lowLabel\", \"Not at all likely\"), (\"nps.highLabel\", \"Extremely likely\"), (\"nps.detractorFeedback\", \"We're sorry to hear that. How can we improve?\"), (\"nps.passiveFeedback\", \"Thanks! What would make it a 10?\"), (\"nps.promoterFeedback\", \"Awesome! We're glad you love it!\"), (\"countdown.days\", \"Days\"), (\"countdown.hours\", \"Hours\"), (\"countdown.minutes\", \"Min\"), (\"countdown.seconds\", \"Sec\"), (\"thumbs.up\", \"Yes\"), (\"thumbs.down\", \"No\"), (\"emoji.veryBad\", \"Very Bad\"), (\"emoji.bad\", \"Bad\"), (\"emoji.okay\", \"Okay\"), (\"emoji.good\", \"Good\"), (\"emoji.great\", \"Great\"), (\"userAvatars.label\", \"users\"), (\"purchaseCount.label\", \"people purchased this today\"), (\"testimonial.anonymous\", \"Anonymous\"), (\"modal.close\", \"Close\"), (\"modal.linkText\", \"Click here\"), (\"modal.missingContent\", \"Modal content would appear here.\"), (\"preview.label\", \"Preview\"), (\"preview.labelBy\", \"Preview · by {name}\"), (\"purchase.error\", \"Something went wrong. Please try again.\"), (\"purchase.restoreNothing\", \"No purchases to restore.\"), (\"purchase.pending\", \"Your purchase is awaiting approval.\"), (\"purchase.trial\", \"Free trial\"), (\"purchase.trialDuration\", \"{duration} free trial\"), (\"purchase.lifetime\", \"lifetime\"), (\"purchase.unit.day\", \"day\"), (\"purchase.unit.week\", \"week\"), (\"purchase.unit.month\", \"month\"), (\"purchase.unit.year\", \"year\"), (\"purchase.pricePerPeriod\", \"{price} \/ {period}\"), (\"a11y.dismiss\", \"Dismiss\"), (\"a11y.loading\", \"Loading\"), (\"a11y.loadingPlans\", \"Loading plans\"), (\"a11y.clearSearch\", \"Clear search\"), (\"a11y.clear\", \"Clear\"), (\"a11y.showPassword\", \"Show password\"), (\"a11y.hidePassword\", \"Hide password\"), (\"a11y.expand\", \"Expand\"), (\"a11y.collapse\", \"Collapse\"), (\"a11y.selected\", \"Selected\"), (\"a11y.checked\", \"Checked\"), (\"a11y.rating\", \"Rating {count}\"), (\"a11y.previous\", \"Previous\"), (\"a11y.next\", \"Next\"), (\"a11y.open\", \"Open\"), (\"a11y.selectDate\", \"Select date\"), (\"a11y.carouselImage\", \"Carousel image\"), (\"a11y.userAvatar\", \"User avatar\"), (\"a11y.authorAvatar\", \"Author avatar\"), (\"a11y.thumbsUp\", \"Thumbs Up\"), (\"a11y.thumbsDown\", \"Thumbs Down\"), (\"a11y.increase\", \"Increase\"), (\"a11y.decrease\", \"Decrease\")]"
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SetgreetStrings.swift",
+      "kind": "Dictionary",
+      "offset": 7474,
+      "length": 3,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/SetgreetStrings.swift",
+      "kind": "Dictionary",
+      "offset": 7728,
+      "length": 3,
+      "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Utils\/Extensions\/String+Ext.swift",
@@ -60196,21 +60241,35 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Data\/Models\/SetgreetFlowModel.swift",
       "kind": "BooleanLiteral",
-      "offset": 971,
+      "offset": 1609,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Data\/Models\/SetgreetFlowModel.swift",
       "kind": "StringLiteral",
-      "offset": 1565,
+      "offset": 2100,
+      "length": 8,
+      "value": "\"locale\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Data\/Models\/SetgreetFlowModel.swift",
+      "kind": "StringLiteral",
+      "offset": 2139,
+      "length": 12,
+      "value": "\"sdkStrings\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Data\/Models\/SetgreetFlowModel.swift",
+      "kind": "StringLiteral",
+      "offset": 2282,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Data\/Models\/SetgreetFlowModel.swift",
       "kind": "IntegerLiteral",
-      "offset": 1594,
+      "offset": 2311,
       "length": 1,
       "value": "1"
     },
@@ -60989,7 +61048,7 @@
       "kind": "StringLiteral",
       "offset": 120,
       "length": 8,
-      "value": "\"1.12.2\""
+      "value": "\"1.13.0\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/DynamicScreenView.swift",
@@ -61491,98 +61550,98 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "Dictionary",
-      "offset": 27917,
+      "offset": 29501,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "Dictionary",
-      "offset": 27957,
+      "offset": 29541,
       "length": 3,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "StringLiteral",
-      "offset": 28034,
+      "offset": 29618,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "IntegerLiteral",
-      "offset": 28065,
+      "offset": 29649,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "IntegerLiteral",
-      "offset": 28095,
+      "offset": 29679,
       "length": 1,
       "value": "1"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "BooleanLiteral",
-      "offset": 28189,
+      "offset": 29773,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "BooleanLiteral",
-      "offset": 28243,
+      "offset": 29827,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "BooleanLiteral",
-      "offset": 28321,
+      "offset": 29905,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "BooleanLiteral",
-      "offset": 28371,
+      "offset": 29955,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "BooleanLiteral",
-      "offset": 28411,
+      "offset": 29995,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "BooleanLiteral",
-      "offset": 28452,
+      "offset": 30036,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "BooleanLiteral",
-      "offset": 28494,
+      "offset": 30078,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "StringLiteral",
-      "offset": 37728,
+      "offset": 39385,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/ComponentRegistry.swift",
       "kind": "Dictionary",
-      "offset": 42665,
+      "offset": 45881,
       "length": 3,
       "value": "[]"
     },
@@ -61792,14 +61851,14 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/QuizComponent.swift",
       "kind": "Array",
-      "offset": 6132,
+      "offset": 6454,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/Components\/QuizComponent.swift",
       "kind": "StringLiteral",
-      "offset": 6180,
+      "offset": 6502,
       "length": 2,
       "value": "\"\""
     },
@@ -62987,44 +63046,51 @@
       "value": "300"
     },
     {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Data\/Models\/FlowGraphResponse.swift",
+      "kind": "StringLiteral",
+      "offset": 1309,
+      "length": 8,
+      "value": "\"locale\""
+    },
+    {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/BottomSheetFlowView.swift",
       "kind": "IntegerLiteral",
-      "offset": 427,
+      "offset": 493,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/BottomSheetFlowView.swift",
       "kind": "IntegerLiteral",
-      "offset": 477,
+      "offset": 543,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/BottomSheetFlowView.swift",
       "kind": "BooleanLiteral",
-      "offset": 522,
+      "offset": 588,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/BottomSheetFlowView.swift",
       "kind": "Array",
-      "offset": 15477,
+      "offset": 15585,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/BottomSheetFlowView.swift",
       "kind": "BooleanLiteral",
-      "offset": 18768,
+      "offset": 18876,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Presentation\/BottomSheetFlowView.swift",
       "kind": "BooleanLiteral",
-      "offset": 19191,
+      "offset": 19299,
       "length": 5,
       "value": "false"
     },
@@ -64746,7 +64812,7 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseDerivation.swift",
       "kind": "Array",
-      "offset": 7547,
+      "offset": 11147,
       "length": 56,
       "value": "[\".\", \",\", \"'\", \"’\", \" \", \" \", \" \"]"
     },
@@ -64777,6 +64843,13 @@
       "offset": 1283,
       "length": 6,
       "value": "\"self\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseOptionFill.swift",
+      "kind": "StringLiteral",
+      "offset": 1228,
+      "length": 25,
+      "value": "\"purchase.pricePerPeriod\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCatalogLoader.swift",
@@ -64837,77 +64910,77 @@
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "StringLiteral",
-      "offset": 9117,
-      "length": 41,
-      "value": "\"Something went wrong. Please try again.\""
+      "offset": 9214,
+      "length": 16,
+      "value": "\"purchase.error\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "StringLiteral",
-      "offset": 9288,
-      "length": 26,
-      "value": "\"No purchases to restore.\""
+      "offset": 9399,
+      "length": 25,
+      "value": "\"purchase.restoreNothing\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "StringLiteral",
-      "offset": 9421,
-      "length": 37,
-      "value": "\"Your purchase is awaiting approval.\""
+      "offset": 9570,
+      "length": 18,
+      "value": "\"purchase.pending\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "StringLiteral",
-      "offset": 9560,
+      "offset": 9705,
       "length": 29,
       "value": "\"setgreet:purchase_completed\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "StringLiteral",
-      "offset": 9633,
+      "offset": 9778,
       "length": 28,
       "value": "\"setgreet:restore_completed\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "StringLiteral",
-      "offset": 10203,
+      "offset": 10617,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "BooleanLiteral",
-      "offset": 10739,
+      "offset": 11153,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "Array",
-      "offset": 10886,
+      "offset": 11300,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "BooleanLiteral",
-      "offset": 11013,
+      "offset": 11427,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "IntegerLiteral",
-      "offset": 11229,
+      "offset": 11643,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/setgreet-ios\/setgreet-ios\/setgreet-ios\/SetgreetSDK\/SetgreetSDK\/Purchases\/PurchaseCoordinator.swift",
       "kind": "BooleanLiteral",
-      "offset": 11910,
+      "offset": 12324,
       "length": 5,
       "value": "false"
     },
