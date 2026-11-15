@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-import SetgreetSDK
+@_spi(SetgreetInternal) import SetgreetSDK
 // Present only when the app opted in with the `setgreet/Lottie` pod. Under
 // Swift Package Manager the app links the SetgreetSDKLottie product itself, so
 // this target cannot import it; `registerLottie()` finds it at runtime instead.
@@ -478,6 +478,9 @@ public class SetgreetPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     let config = SetgreetConfig(debugMode: debugMode)
 
     DispatchQueue.main.async { [weak self] in
+      // Sent as X-Setgreet-Sdk-Flavor, so flows can branch on
+      // `setgreet:sdk_flavor`. Before initialize: the first request has it.
+      Setgreet.shared.setSdkFlavor("flutter")
       Setgreet.shared.initialize(appKey: appKey, config: config)
       self?.setupFlowCallbacks()
     }

@@ -1,5 +1,6 @@
 package com.setgreet.flutter
 
+import android.annotation.SuppressLint
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
@@ -344,6 +345,9 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
     ErrorType.UNKNOWN -> "unknown"
   }
 
+  // setSdkFlavor is restricted to the Setgreet library group (not public
+  // API); this plugin is Setgreet's own, in another Maven group.
+  @SuppressLint("RestrictedApi")
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     when (call.method) {
       "initialize" -> {
@@ -357,6 +361,9 @@ class SetgreetPlugin: FlutterPlugin, MethodCallHandler, EventChannel.StreamHandl
           }
 
           val config = SetgreetConfig(debugMode = debugMode)
+          // Sent as X-Setgreet-Sdk-Flavor, so flows can branch on
+          // `setgreet:sdk_flavor`. Before initialize: the first request has it.
+          Setgreet.setSdkFlavor("flutter")
           Setgreet.initialize(context, appKey!!, config)
           setupFlowCallbacks()
           result.success(null)
