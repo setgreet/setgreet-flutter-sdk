@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.1] - 2026-11-16
+
+### Changed
+
+- Native SDKs updated to Android 1.14.0 and iOS 1.14.0: a time picker and a searchable select, date pickers that open in a bottom sheet with typing and date limits, colour settings for inputs, values computed from earlier answers, paywall copy that follows trial eligibility, and targeting by platform, app version and OS version.
+- The plugin tells the native SDK it runs inside Flutter, so flows can target Flutter apps.
+
+### Fixed
+
+- The 1.14.0 tag was never published to pub.dev; 1.14.1 is the same release.
+
+## [1.13.0] - 2026-11-10
+
+### Changed
+
+- Native SDKs updated to Android 1.13.0 and iOS 1.13.0: text, dates and numbers in a flow follow the language it is shown in, and built-in labels, placeholders, screen reader text and paywall period and trial words are translated.
+
+## [1.12.0] - 2026-11-07
+
+### Changed
+
+- Native SDKs updated to Android 1.12.0 and iOS 1.12.2: prices a paywall works out on the device follow the store's price format for the user's region, and stacked option cards follow the colours set in the editor.
+
 ## [1.11.0] - 2026-11-04
 
 ### Changed
