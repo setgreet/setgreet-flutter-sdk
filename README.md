@@ -164,6 +164,18 @@ WidgetsBinding.instance.addPostFrameCallback((_) {
 `SetgreetThemeException` on failure. Point it at a non-production backend by
 passing `apiUrl` in `SetgreetConfig` at `initialize` time.
 
+If your app imports `package:material_ui/material_ui.dart` instead of
+`package:flutter/material.dart`, wrap your app in `MaterialUiCompatibilityBridge`
+so `syncTheme` can read your theme. Without the bridge it reads the default
+Material theme:
+
+```dart
+MaterialApp(
+  builder: (context, child) => MaterialUiCompatibilityBridge(child: child!),
+  home: const HomeScreen(),
+);
+```
+
 ### Identify User
 
 Identifies a user for Setgreet analytics and flow management.
