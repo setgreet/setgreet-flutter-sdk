@@ -80,6 +80,7 @@ extension Foundation.Data {
   public func identifyUser(userId: Swift.String, attributes: [Swift.String : Any]? = nil, operation: SetgreetSDK.Operation = .create, locale: Swift.String? = nil, userHash: Swift.String? = nil)
   public func identifyUser(userId: Swift.String, attributes: [Swift.String : Any]? = nil, locale: Swift.String? = nil, userHash: Swift.String? = nil)
   public func showFlow(flowId: Swift.String)
+  @_spi(SetgreetInternal) public func setSdkFlavor(_ flavor: Swift.String)
   @_spi(SetgreetInternal) public func showSharedPreview(token: Swift.String, locale: Swift.String? = nil)
   @_spi(SetgreetInternal) public func fetchSharedPreviewLocales(token: Swift.String) async throws -> [Swift.String]
   public func trackEvent(eventName: Swift.String, properties: [Swift.String : Any]? = nil)
@@ -366,9 +367,10 @@ public struct FlowNodeData : Swift.Codable {
   public let componentId: Swift.String?
   public let componentType: Swift.String?
   public let saveToAttribute: SetgreetSDK.SaveToAttributeConfig?
-  public init(screenId: Swift.String? = nil, trigger: SetgreetSDK.FlowTrigger? = nil, label: Swift.String? = nil, componentId: Swift.String? = nil, componentType: Swift.String? = nil, saveToAttribute: SetgreetSDK.SaveToAttributeConfig? = nil)
-  public func encode(to encoder: any Swift.Encoder) throws
+  public let computedName: Swift.String?
+  public init(screenId: Swift.String? = nil, trigger: SetgreetSDK.FlowTrigger? = nil, label: Swift.String? = nil, componentId: Swift.String? = nil, componentType: Swift.String? = nil, saveToAttribute: SetgreetSDK.SaveToAttributeConfig? = nil, computedName: Swift.String? = nil)
   public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
 }
 public struct FlowEdge : Swift.Codable, Swift.Identifiable {
   public let id: Swift.String
@@ -543,8 +545,8 @@ public struct ComponentCondition : Swift.Codable {
   public let `operator`: SetgreetSDK.ConditionOperator
   public let value: SetgreetSDK.AnyCodable
   public init(field: Swift.String, source: SetgreetSDK.ConditionSource, operator: SetgreetSDK.ConditionOperator, value: SetgreetSDK.AnyCodable)
-  public func encode(to encoder: any Swift.Encoder) throws
   public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
 }
 public enum ConditionSource : Swift.String, Swift.Codable {
   case userAttribute
@@ -1260,6 +1262,36 @@ public enum BottomSheetInitialHeight : Swift.String, Swift.Codable {
     get
   }
 }
+public struct ComputedValueResult : Swift.Equatable {
+  public enum Value : Swift.Equatable {
+    case string(Swift.String)
+    case int(Swift.Int)
+    public var stringValue: Swift.String {
+      get
+    }
+    public static func == (a: SetgreetSDK.ComputedValueResult.Value, b: SetgreetSDK.ComputedValueResult.Value) -> Swift.Bool
+  }
+  public let value: SetgreetSDK.ComputedValueResult.Value
+  public let label: Swift.String
+  public init(value: SetgreetSDK.ComputedValueResult.Value, label: Swift.String? = nil)
+  public static func == (a: SetgreetSDK.ComputedValueResult, b: SetgreetSDK.ComputedValueResult) -> Swift.Bool
+}
+public struct ComputedValueDefinition : Swift.Equatable {
+  public struct Row : Swift.Equatable {
+    public static func == (a: SetgreetSDK.ComputedValueDefinition.Row, b: SetgreetSDK.ComputedValueDefinition.Row) -> Swift.Bool
+  }
+  public struct EnumCase : Swift.Equatable {
+    public static func == (a: SetgreetSDK.ComputedValueDefinition.EnumCase, b: SetgreetSDK.ComputedValueDefinition.EnumCase) -> Swift.Bool
+  }
+  public struct Fallback : Swift.Equatable {
+    public static func == (a: SetgreetSDK.ComputedValueDefinition.Fallback, b: SetgreetSDK.ComputedValueDefinition.Fallback) -> Swift.Bool
+  }
+  public let name: Swift.String
+  public let from: Swift.String
+  public let type: Swift.String
+  public let preset: Swift.String?
+  public static func == (a: SetgreetSDK.ComputedValueDefinition, b: SetgreetSDK.ComputedValueDefinition) -> Swift.Bool
+}
 @_hasMissingDesignatedInitializers final public class FlowAnalyticsCollector {
   public static let shared: SetgreetSDK.FlowAnalyticsCollector
   final public var maxBatchSize: Swift.Int
@@ -1360,6 +1392,7 @@ final public class FlowNavigationEngine {
   final public func getNextNodeId(from nodeId: Swift.String) -> Swift.String?
   final public func navigateNext() -> (screen: SetgreetSDK.ScreenWithComponents, nodeId: Swift.String, screenIndex: Swift.Int)?
   final public func navigateNextSkippingCurrent() -> (screen: SetgreetSDK.ScreenWithComponents, nodeId: Swift.String, screenIndex: Swift.Int)?
+  final public func visitedScreens() -> [SetgreetSDK.ScreenWithComponents]
   final public func previousFullscreenScreen() -> SetgreetSDK.ScreenWithComponents?
   final public func navigateBack() -> (screen: SetgreetSDK.ScreenWithComponents, nodeId: Swift.String, screenIndex: Swift.Int)?
   final public func getBranchNodesForScreen(_ screenNodeId: Swift.String) -> [SetgreetSDK.FlowNode]
@@ -1499,6 +1532,12 @@ public struct MultiSelectComponent : SetgreetSDK.SetgreetComponentProtocol {
   public static func render(instance: SetgreetSDK.ComponentInstance, context: SetgreetSDK.ComponentContext) -> SwiftUICore.AnyView
 }
 public struct DatePickerComponent : SetgreetSDK.SetgreetComponentProtocol {
+  public static var componentType: Swift.String {
+    get
+  }
+  public static func render(instance: SetgreetSDK.ComponentInstance, context: SetgreetSDK.ComponentContext) -> SwiftUICore.AnyView
+}
+public struct SearchSelectComponent : SetgreetSDK.SetgreetComponentProtocol {
   public static var componentType: Swift.String {
     get
   }
