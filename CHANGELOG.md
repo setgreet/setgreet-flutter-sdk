@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.14.2] - 2026-11-17
 
-### Fixed
+### Changed
 
-- Native SDKs updated to Android 1.14.1 and iOS 1.14.1. On iOS, a translated flow started twice when it appeared, which left a paywall showing the raw price and its purchase and restore buttons doing nothing. Also layout fixes: content and bottom sheets keep clear of the home indicator and navigation bar, and backdrop images and background colours reach the screen edges as in the editor preview.
+- Native SDKs updated to Android 1.14.1 and iOS 1.14.1: improved reliability when showing flows in the user's language, including paywalls, and layout refinements so screens and bottom sheets match the editor preview more closely.
 
 ## [1.14.1] - 2026-11-16
 
@@ -18,9 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Native SDKs updated to Android 1.14.0 and iOS 1.14.0: a time picker and a searchable select, date pickers that open in a bottom sheet with typing and date limits, colour settings for inputs, values computed from earlier answers, paywall copy that follows trial eligibility, and targeting by platform, app version and OS version.
 - The plugin tells the native SDK it runs inside Flutter, so flows can target Flutter apps.
 
-### Fixed
-
-- The 1.14.0 tag was never published to pub.dev; 1.14.1 is the same release.
+1.14.0 was not published to pub.dev; its changes are part of 1.14.1.
 
 ## [1.13.0] - 2026-11-10
 
