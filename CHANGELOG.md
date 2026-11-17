@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.2] - 2026-11-17
+
+### Fixed
+
+- Native SDKs updated to Android 1.14.1 and iOS 1.14.1. On iOS, a translated flow started twice when it appeared, which left a paywall showing the raw price and its purchase and restore buttons doing nothing. Also layout fixes: content and bottom sheets keep clear of the home indicator and navigation bar, and backdrop images and background colours reach the screen edges as in the editor preview.
+
 ## [1.14.1] - 2026-11-16
 
 ### Changed
